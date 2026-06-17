@@ -1,0 +1,271 @@
+================================================================================
+                          TELEPROMPTER SCRIPT
+              "WHY YOU SHOULD LISTEN TO THE PRESENTER"
+================================================================================
+Instructions for Teleprompter Software:
+1. Spoken text is in regular casing with frequent line breaks for easy scrolling.
+2. Direct presenter cues, actions, and slide transitions are in brackets [LIKE THIS] 
+   and should NOT be read aloud.
+3. Slide breaks are marked with [--- SLIDE X ---].
+================================================================================
+
+[--- SLIDE 1: TITLE SLIDE ---]
+[CUE: Start speaking immediately. Establish baseline microphone level.]
+
+Good morning, everyone. 
+
+Or good afternoon, depending on what timezone my brain is currently in.
+
+Welcome. 
+
+Today, we are going to explore one of the greatest mysteries in human history: 
+
+"Why should anyone listen to the presenter?"
+
+Now, while you ponder this profound question, you might notice that my slides look clean and my voice is projecting nicely.
+
+That is because this is actually a stealthy five-minute audio-visual technical check.
+
+So if I'm too quiet, or if my face looks green on screen, we'll fix it now!
+
+[CUE: ADVANCE TO NEXT SLIDE]
+
+
+
+[--- SLIDE 2: THE CREDIBILITY FORMULA ---]
+[CUE: Gesture to the formula box on screen.]
+
+After years of intensive research, we have synthesized the Universal Credibility Formula.
+
+As you can see, credibility is directly proportional to confidence and volume...
+
+And it is inversely proportional to the number of times I say "Um."
+
+Confidence is my job.
+
+Volume is the tech booth's job.
+
+And "Um" is the friction.
+
+If my volume drops, that's a soundboard calibration issue.
+
+If I say "Um," that's a personal calibration issue.
+
+So we are working in partnership here!
+
+[CUE: ADVANCE TO NEXT SLIDE]
+
+
+
+[--- SLIDE 3: THE CONFIDENCE MONITOR ---]
+[CUE: Look down at the floor screen, acknowledging its position.]
+
+This brings us to the confidence monitor on the floor in front of me.
+
+The expectation is that I look at you, and only glance down occasionally.
+
+The reality is that this screen is highly magnetic.
+
+It takes enormous strength not to just stare at my feet and read this word-for-word like a hostage.
+
+Let's do a live calibration. 
+
+Tech team: the monitor looks great, the text size is spot on, and I am going to try my best to look up at the audience now.
+
+[CUE: ADVANCE TO NEXT SLIDE]
+
+
+
+[--- SLIDE 4: THE MICROPHONE PARADOX ---]
+[CUE: Change vocal dynamics here. Speak softly, then speak with higher projection.]
+
+Now for audio check part two: The Microphone Paradox.
+
+When handed a mic, everyone wants to tap it.
+
+Please don't. The sound engineers will wince.
+
+Instead, let's test dynamic range.
+
+I'm going to whisper a bit to see if you can still hear me clearly. 
+
+[SPEAK IN A WHISPER]
+Testing the noise gate. Can you still hear me in the back? Excellent.
+
+[SPEAK IN NORMAL HIGH-ENERGY PRESENTING VOICE]
+Now, I'll speak at a higher projection to make sure we aren't clipping the master channel.
+
+Perfect. The sound is crisp and there's no feedback.
+
+[CUE: ADVANCE TO NEXT SLIDE]
+
+
+
+[--- SLIDE 5: PROJECTOR CALIBRATION ---]
+[CUE: Gesture generally to the screen colors behind you.]
+
+Next, we have a visual calibration check.
+
+We have eight color swatches lined up.
+
+These test the projector's color fidelity.
+
+If my magenta block looks red, or the yellow looks like green...
+
+Then either the projector bulb is tired, or my design choices are even worse than my wardrobe.
+
+Everything looks highly vibrant up here. 
+
+The colors are perfectly balanced.
+
+[CUE: ADVANCE TO NEXT SLIDE]
+
+
+
+[--- SLIDE 6: THE CLICKER LATENCY ---]
+[CUE: Walk to stage left, press clicker, then walk to stage right.]
+
+Let's test the wireless clicker range.
+
+I'm going to walk over to stage left, press the button... and it works.
+
+Now, stage right... press... works.
+
+The latency check is successful.
+
+We want to avoid the Clicker Paradox...
+
+Where you press the clicker, nothing happens for three seconds, you press it again in a panic...
+
+And suddenly you're three slides ahead, looking at your thank you slide before you've even introduced your topic.
+
+[CUE: ADVANCE TO NEXT SLIDE]
+
+
+
+[--- SLIDE 7: THE LASER POINTER ---]
+[CUE: Turn on laser pointer and target a data point on the screen.]
+
+Pillar number one of presentation authority is the laser pointer.
+
+It is scientifically proven that humans have a cat-like response to a tiny dot of light.
+
+If I point it here, you look here.
+
+However, the most important rule is the danger zone.
+
+Never point your laser pointer at the tech booth.
+
+The crew has controls that can instantly cut your mic, play exit music, or turn off the projector.
+
+Keep the laser on the screen!
+
+[CUE: ADVANCE TO NEXT SLIDE]
+
+
+
+[--- SLIDE 8: THE VIDEO EMBED GAMBLE ---]
+[CUE: Trace the flowchart boxes with your hand.]
+
+The ultimate high-stakes gamble in modern presenting is the embedded video.
+
+You click play, you wait, and you pray to the AV gods.
+
+Usually, the video works, but there is no sound.
+
+You look at the tech crew, they look at you, and you both participate in an awkward staring contest.
+
+Thankfully, we are keeping it safe today with static slides.
+
+But if you have a video in your presentation, make sure to test it during soundcheck!
+
+[CUE: ADVANCE TO NEXT SLIDE]
+
+
+
+[--- SLIDE 9: PRESENTER WARDROBE ---]
+[CUE: Look down at your outfit, then back at the audience.]
+
+Pillar number two of credibility is your wardrobe.
+
+It is a technical check for the video team.
+
+If you wear a black shirt in front of a dark slide, on camera you look like a floating head.
+
+If you wear tiny pinstripes, you create a moiré effect that makes the camera sensor look like it's hallucinating.
+
+Also, always wear something with a waistband.
+
+If you don't, the tech crew has to clip a heavy wireless battery pack to your collar...
+
+Which ruins your posture and your confidence.
+
+[CUE: ADVANCE TO NEXT SLIDE]
+
+
+
+[--- SLIDE 10: STAGE BOUNDARIES ---]
+[CUE: Walk center-stage, then walk left, then walk right.]
+
+This slide is a physical boundary check.
+
+Stage Left is a Safe Zone—nice lighting, no feedback.
+
+Center Stage is the Spotlight, where the camera is framed.
+
+And Stage Right... well, that is where we get close to the main speakers.
+
+Let's test this.
+
+Walking center...
+
+Now walking right...
+
+If we hear feedback, we know the boundary limit.
+
+Everything sounds great. 
+
+Tech crew, you tuned these feedback suppressors beautifully!
+
+[CUE: ADVANCE TO NEXT SLIDE]
+
+
+
+[--- SLIDE 11: AUDIENCE ATTENTION ---]
+[CUE: Point to the bar chart data.]
+
+Let's look at the scientific data regarding audience attention.
+
+As this bar chart shows, only ten percent of you are actually listening.
+
+A whopping forty-eight percent are thinking of the lunch buffet.
+
+And thirty percent are checking emails.
+
+This is why visual engagement is so important—it is the only way I can compete with your inbox!
+
+Also, tech crew: check the text at the very bottom of the screen.
+
+If you can read that margin calibration notice, our projector framing is perfect.
+
+[CUE: ADVANCE TO NEXT SLIDE]
+
+
+
+[--- SLIDE 12: TRUST THE TECH CREW ---]
+[CUE: Prepare to transition mic. Raise energy level.]
+
+In conclusion, the ultimate rule of presentation credibility isn't your slides, your laser pointer, or your wardrobe.
+
+It's the technical team in the back of the room.
+
+They hold the ultimate power to make you look like a rockstar, or turn you into a muted mime.
+
+Let's give a warm round of applause to our AV and technical crew...
+
+And let's get the main event started.
+
+Thank you!
+
+[CUE: MIC OFF. EXIT STAGE. OUTRO MUSIC FADES IN.]
+================================================================================

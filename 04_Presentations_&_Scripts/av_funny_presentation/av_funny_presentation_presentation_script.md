@@ -1,0 +1,66 @@
+# AV Masterclass Presentation Script
+## 5-Minute Speech for AV Troubleshooting & Tropes
+
+> [!NOTE]
+> This document contains the exact speaker notes from the PowerPoint presentation. Use this for mic tests, teleprompter programs, or reading during setup.
+
+### Slide 1: Title Slide
+> WELCOME / SPEAKER PROMPT (0:00 - 0:50)
+> ---------------------------------------
+> Hello, everyone, and welcome! Today I am going to answer the single most terrifying question any presenter can face: 'Why should you listen to me?' Now, you might think it is because of my credentials, my years of experience, or my winning smile. But the real answer is much simpler: because my microphone is actually turned on, the volume is adjusted correctly, and the high-frequency feedback has not yet induced a fight-or-flight response in the front row.
+> 
+> If you can hear my voice clearly right now, that alone puts me in the top ten percent of speakers in the world. Also, let's take this moment to look down and make sure the floor confidence monitor is displaying these speaker notes correctly. If it isn't... well, I am currently reading a blank screen and will have to resort to making wild hand gestures. Let's move on.
+
+---
+
+### Slide 2: Audio Check
+> AUDIO CHECKLIST / SPEAKER PROMPT (0:50 - 1:40)
+> -----------------------------------------------
+> Let's dive into Chapter One: Sound. Why should you listen to me? Well, because I am not committing the classic microphone offenses. 
+> 
+> First: the dreaded 'Mic Tap.' Presenters love walking up, slapping the mic, and asking, 'Is this thing on?' while the sound technician in the back curls into the fetal position. Then we have the Ventriloquists. These are speakers who hold a handheld microphone down at their belly button or clip a lapel mic to their belt, assuming their stomach speaks fluent English. Keep the microphone close to your chin, folks!
+> 
+> And finally: the Feedback Dance. If you walk directly in front of the main house speakers while wearing a live lapel mic, you will trigger a high-pitched shriek. If feedback begins, do not panic. Do not look at the soundboard. Just look accusingly at the ceiling vents. The audience will assume it's the air conditioning, and you will preserve your authority. Next slide, please.
+
+---
+
+### Slide 3: Video Setup
+> VIDEO / SPEAKER PROMPT (1:40 - 2:30)
+> -------------------------------------
+> Let's move to Chapter Two: Video and the Dongle Roulette. Why should you listen to me? Because I am actually displaying my slides without a catastrophic resolution meltdown.
+> 
+> Every presenter brings a laptop, and every presenter assumes the stage has their exact plug. This triggers Dongle Roulette—stacking adapters together like a Lego set until the signal passes through HDMI, USB-C, and VGA. Then comes the aspect ratio stretch. If I look slightly wider on screen, it is not my weight—it's the projector stretching my 16:9 widescreen slides into 4:3. Also, let's remember the classic presenter quote: 'I swear it worked in my hotel room!' Yes, because in your room you were connected to your local hard drive, and now you're trying to play an embedded 4K video over the convention center's guest Wi-Fi. If my slides are showing, you should listen to me. If they freeze, just look at the confidence monitor and keep going.
+
+---
+
+### Slide 4: Confidence Monitor
+> CONFIDENCE MONITOR / SPEAKER PROMPT (2:30 - 3:20)
+> --------------------------------------------------
+> Chapter Three: The Confidence Monitor. Why should you listen to me? Because I am looking at you, not at the giant screen behind my head. 
+> 
+> The standard presenter trope is the 'Owl Turn.' This is when a speaker stands on stage, spins their back to the crowd, and stares blankly at their own slides like they are looking at a solar eclipse. It ruins all engagement. The cure is the confidence monitor—the floor screen. If the AV team has set it up right, I can see my slides, a giant timer counting down my remaining minutes of dignity, and the exact speaker notes I am reading right now. It lets me pretend I'm giving a spontaneous, brilliant lecture while in reality, I am reading off a teleprompter at my feet. If you see me staring intently at the floor, I'm not praying—I'm just reading Slide 4. Let's move to the Q&A.
+
+---
+
+### Slide 5: Q&A Handling
+> Q&A SESSION / SPEAKER PROMPT (3:20 - 4:10)
+> --------------------------------------------
+> Chapter Four: Q&A. The ultimate test of why you should listen to me. This is where the presentation enters the wilderness. 
+> 
+> The absolute classic trope is the audience member who raises their hand, grabs the microphone, and declares: 'This is more of a comment than a question.' They then proceed to outline their personal PhD thesis. Another hazard is the 'shouter'—the person who refuses to wait for the mic runner, yells their question, and leaves the virtual live stream audience in complete silence. 
+> 
+> As the presenter, my job is to repeat the question so the recording catches it, pretend I understood it, and answer it before the giant digital clock at my feet turns bright red. If we survive the Q&A without a laptop crash or a wireless signal cutout, we have successfully run the AV gauntlet. Let's wrap up.
+
+---
+
+### Slide 6: Conclusion
+> CONCLUSION / SPEAKER PROMPT (4:10 - 5:00)
+> ------------------------------------------
+> In conclusion: why did you listen to me today? Not because of my slides, but because of the AV crew. The microphone didn't cut out, the video played at the correct aspect ratio, and the confidence monitor kept me from turning around and showing you the back of my head. 
+> 
+> The AV crew holds the ultimate power. They can make any speaker look like a global visionary, or they can accidentally leave a fader open and let the room hear you complaining about the backstage coffee. The next time you see a technician taping down cables or tweaking faders, go buy them a coffee. They are the unsung heroes of corporate sanity. 
+> 
+> Thank you all, and please: remember to return your wireless clicker to the podium!
+
+---
+

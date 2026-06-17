@@ -1,2306 +1,2360 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corporate AV Calibration & Diagnostics Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-base: #020617; /* slate-950 */
-            --bg-card: rgba(15, 23, 42, 0.65); /* slate-900 with glass opacity */
-            --bg-card-hover: rgba(30, 41, 59, 0.8); /* slate-800 */
-            --border-glow: rgba(56, 189, 248, 0.2); /* sky-400 */
-            --border-glow-active: rgba(20, 184, 166, 0.5); /* teal-500 */
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent-cyan: #06b6d4; /* cyan-500 */
-            --accent-teal: #14b8a6; /* teal-500 */
-            --accent-rose: #f43f5e; /* rose-500 */
-            --accent-amber: #f59e0b; /* amber-500 */
-            --font-display: 'Space Grotesk', sans-serif;
-            --font-body: 'Outfit', sans-serif;
-            --shadow-glow: 0 0 20px rgba(6, 182, 212, 0.15);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-base);
-            color: var(--text-primary);
-            font-family: var(--font-body);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(20, 184, 166, 0.05) 0%, transparent 40%);
-        }
-
-        header {
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-section svg {
-            width: 2.2rem;
-            height: 2.2rem;
-            fill: var(--accent-cyan);
-            filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5));
-        }
-
-        .logo-section h1 {
-            font-family: var(--font-display);
-            font-size: 1.4rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(20, 184, 166, 0.1);
-            border: 1px solid rgba(20, 184, 166, 0.2);
-            padding: 0.4rem 0.8rem;
-            border-radius: 9999px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--accent-teal);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent-teal);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(20, 184, 166, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(20, 184, 166, 0); }
-        }
-
-        .main-layout {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - 4.5rem);
-            position: relative;
-        }
-
-        /* Sidebar navigation */
-        .sidebar {
-            width: 16rem;
-            background: rgba(15, 23, 42, 0.3);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            padding: 1.5rem 1rem;
-        }
-
-        .nav-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--text-secondary);
-            padding: 0.8rem 1rem;
-            border-radius: 12px;
-            cursor: pointer;
-            text-align: left;
-            font-family: var(--font-body);
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-btn svg {
-            width: 1.25rem;
-            height: 1.25rem;
-            fill: currentColor;
-        }
-
-        .nav-btn:hover {
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .nav-btn.active {
-            color: var(--text-primary);
-            background: rgba(6, 182, 212, 0.1);
-            border-color: var(--border-glow);
-            box-shadow: var(--shadow-glow);
-        }
-
-        /* Content area */
-        .content-area {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .tab-panel {
-            display: none;
-            animation: fadeIn 0.4s ease-out;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .tab-panel.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .panel-header {
-            margin-bottom: 2rem;
-        }
-
-        .panel-header h2 {
-            font-family: var(--font-display);
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-
-        .panel-header p {
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-
-        /* Bento Grid Components */
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .glass-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 1.5rem;
-            backdrop-filter: blur(16px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, transparent 60%);
-            pointer-events: none;
-        }
-
-        .glass-card:hover {
-            border-color: var(--border-glow);
-            background: var(--bg-card-hover);
-            transform: translateY(-2px);
-        }
-
-        .card-title {
-            font-family: var(--font-display);
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-primary);
-        }
-
-        .card-title svg {
-            width: 1.25rem;
-            height: 1.25rem;
-            fill: var(--accent-cyan);
-        }
-
-        /* 🎛️ Audio Generator Styles */
-        .control-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .control-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .slider-input {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 9999px;
-            outline: none;
-            -webkit-appearance: none;
-            transition: background 0.3s;
-        }
-
-        .slider-input::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            background: var(--accent-cyan);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
-            transition: transform 0.1s;
-        }
-
-        .slider-input::-webkit-slider-thumb:hover {
-            transform: scale(1.25);
-        }
-
-        .btn-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--text-primary);
-            padding: 0.6rem 1rem;
-            border-radius: 10px;
-            cursor: pointer;
-            font-family: var(--font-body);
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .btn.active {
-            background: rgba(6, 182, 212, 0.2);
-            border-color: var(--accent-cyan);
-            color: var(--text-primary);
-            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
-            border: none;
-            color: #020617;
-            font-weight: 600;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            transform: scale(1.02);
-        }
-
-        .btn-danger {
-            background: var(--accent-rose);
-            border: none;
-            color: white;
-            font-weight: 600;
-        }
-
-        .btn-danger:hover {
-            opacity: 0.9;
-            box-shadow: 0 0 15px rgba(244, 63, 94, 0.4);
-        }
-
-        .preset-badge {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .preset-badge:hover {
-            background: rgba(6, 182, 212, 0.1);
-            border-color: var(--accent-cyan);
-            color: var(--text-primary);
-        }
-
-        /* 📺 Calibration Fullscreen Interface */
-        .calibration-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1rem;
-        }
-
-        .cal-item {
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .cal-item:hover {
-            border-color: var(--accent-cyan);
-            background: rgba(6, 182, 212, 0.05);
-        }
-
-        .cal-item-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            margin: 0 auto 0.75rem auto;
-            fill: var(--text-secondary);
-            transition: fill 0.2s;
-        }
-
-        .cal-item:hover .cal-item-icon {
-            fill: var(--accent-cyan);
-        }
-
-        .cal-item-title {
-            font-weight: 500;
-            font-size: 0.95rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .cal-item-desc {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        /* Calibration canvas container (hidden by default) */
-        #fullscreen-canvas-container {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: black;
-            z-index: 9999;
-            cursor: none;
-        }
-
-        #cal-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        .exit-hint {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            color: white;
-            opacity: 0;
-            transition: opacity 0.5s;
-            pointer-events: none;
-        }
-
-        #fullscreen-canvas-container:hover .exit-hint {
-            opacity: 1;
-        }
-
-        /* 🎥 WebRTC Diagnostics Styles */
-        .video-preview {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: #090d16;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            object-fit: cover;
-            margin-bottom: 1rem;
-        }
-
-        .device-select {
-            width: 100%;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--text-primary);
-            padding: 0.6rem 0.8rem;
-            border-radius: 10px;
-            font-family: var(--font-body);
-            margin-bottom: 1rem;
-            outline: none;
-        }
-
-        .device-select:focus {
-            border-color: var(--accent-cyan);
-        }
-
-        .vu-meter-container {
-            background: #090d16;
-            border-radius: 10px;
-            padding: 0.75rem;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            margin-top: 1rem;
-        }
-
-        .vu-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.4rem;
-        }
-
-        .vu-bar-wrapper {
-            height: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 9999px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .vu-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #10b981 0%, #f59e0b 70%, #ef4444 90%);
-            transition: width 0.05s ease-out;
-        }
-
-        .vu-value {
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        /* 📋 Checklist Styles */
-        .checklist-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .checklist-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .checklist-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.85rem;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            padding: 0.9rem 1.2rem;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .checklist-item:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.07);
-        }
-
-        .checklist-item input[type="checkbox"] {
-            width: 1.15rem;
-            height: 1.15rem;
-            accent-color: var(--accent-teal);
-            margin-top: 0.1rem;
-            cursor: pointer;
-        }
-
-        .checklist-text {
-            font-size: 0.95rem;
-            line-height: 1.4;
-            color: var(--text-primary);
-        }
-
-        .checklist-item.checked .checklist-text {
-            text-decoration: line-through;
-            color: var(--text-secondary);
-        }
-
-        .checklist-badge {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            padding: 0.15rem 0.4rem;
-            border-radius: 4px;
-            display: inline-block;
-            margin-bottom: 0.3rem;
-        }
-
-        .badge-critical { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); }
-        .badge-standard { background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.2); }
-        .badge-physical { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.2); }
-
-        .report-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-
-        .report-content {
-            background: #0f172a;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 600px;
-            padding: 2rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-
-        .report-textarea {
-            width: 100%;
-            height: 250px;
-            background: #020617;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 1rem;
-            color: #10b981;
-            font-family: monospace;
-            font-size: 0.85rem;
-            margin: 1rem 0;
-            resize: none;
-            outline: none;
-        }
-
-        /* 🎥 Interactive Sync Tester Component */
-        .sync-tester-display {
-            background: #090d16;
-            border-radius: 15px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .sync-canvas-wrapper {
-            background: black;
-            border-radius: 10px;
-            overflow: hidden;
-            aspect-ratio: 16/7;
-            max-width: 600px;
-            margin: 0 auto 1.5rem auto;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        #sync-tester-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        /* Reference Library styles */
-        .lib-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        .lib-section {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .lib-section:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-            margin-bottom: 0;
-        }
-
-        .lib-subtitle {
-            font-family: var(--font-display);
-            font-size: 1.1rem;
-            color: var(--accent-cyan);
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .lib-text {
-            font-size: 0.9rem;
-            line-height: 1.5;
-            color: var(--text-secondary);
-        }
-
-        .lib-code {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 0.15rem 0.3rem;
-            border-radius: 4px;
-            font-family: monospace;
-            color: #14b8a6;
-            font-size: 0.85rem;
-        }
-
-        .alert-box {
-            background: rgba(245, 158, 11, 0.08);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            border-radius: 10px;
-            padding: 1rem;
-            color: #f59e0b;
-            font-size: 0.85rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            gap: 0.75rem;
-            align-items: flex-start;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Corporate AV Toolkit Enhanced</title>
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@500,700,800&display=swap" rel="stylesheet" />
+  <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+      --space-16: 4rem;
+
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+
+      --shadow-sm: 0 1px 2px oklch(0.2 0.01 80 / 0.06);
+      --shadow-md: 0 8px 24px oklch(0.2 0.01 80 / 0.10);
+      --shadow-lg: 0 18px 48px oklch(0.2 0.01 80 / 0.16);
+
+      --color-bg: #f7f6f2;
+      --color-surface: #f9f8f5;
+      --color-surface-2: #fbfbf9;
+      --color-surface-offset: #f3f0ec;
+      --color-surface-dynamic: #e6e4df;
+      --color-border: #d4d1ca;
+      --color-divider: #dcd9d5;
+
+      --color-text: #28251d;
+      --color-text-muted: #66655f;
+      --color-text-faint: #9a9892;
+      --color-text-inverse: #f9f8f4;
+
+      --color-primary: #01696f;
+      --color-primary-hover: #0c4e54;
+      --color-primary-highlight: #dceced;
+      --color-success: #437a22;
+      --color-warning: #964219;
+      --color-error: #a12c7b;
+
+      --font-display: 'Cabinet Grotesk', 'Inter', sans-serif;
+      --font-body: 'Satoshi', 'Inter', sans-serif;
+      --header-height: 76px;
+    }
+
+    [data-theme="dark"] {
+      --color-bg: #171614;
+      --color-surface: #1c1b19;
+      --color-surface-2: #201f1d;
+      --color-surface-offset: #22211f;
+      --color-surface-dynamic: #2d2c2a;
+      --color-border: #393836;
+      --color-divider: #262523;
+
+      --color-text: #e3e1dc;
+      --color-text-muted: #afa9a1;
+      --color-text-faint: #7c7973;
+      --color-text-inverse: #171614;
+
+      --color-primary: #4f98a3;
+      --color-primary-hover: #6caeb8;
+      --color-primary-highlight: #243236;
+      --color-success: #7cbe52;
+      --color-warning: #d78f52;
+      --color-error: #de76ba;
+
+      --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.20);
+      --shadow-md: 0 8px 24px oklch(0 0 0 / 0.28);
+      --shadow-lg: 0 18px 48px oklch(0 0 0 / 0.40);
+    }
+
+    * , *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background:
+        radial-gradient(circle at top right, color-mix(in oklab, var(--color-primary) 10%, transparent), transparent 22%),
+        var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: 1.6;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+
+    .skip-link {
+      position: absolute;
+      left: 1rem;
+      top: -100px;
+      z-index: 50;
+      background: var(--color-primary);
+      color: var(--color-text-inverse);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+    }
+
+    .skip-link:focus { top: 1rem; }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 100dvh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100dvh;
+      padding: var(--space-6);
+      border-right: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
+      background: color-mix(in oklab, var(--color-surface) 94%, var(--color-primary) 6%);
+      overflow: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--color-primary), color-mix(in oklab, var(--color-primary) 55%, white));
+      color: white;
+      box-shadow: var(--shadow-sm);
+      flex: 0 0 auto;
+    }
+
+    .brand-copy h1 {
+      margin: 0;
+      font: 800 var(--text-lg)/1.05 var(--font-display);
+      letter-spacing: -0.03em;
+    }
+
+    .brand-copy p {
+      margin: 0.2rem 0 0;
+      color: var(--color-text-muted);
+      font-size: var(--text-xs);
+    }
+
+    .theme-toggle {
+      margin-left: auto;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in oklab, var(--color-text) 12%, transparent);
+      background: var(--color-surface-2);
+      display: grid;
+      place-items: center;
+    }
+
+    .nav-group { margin-bottom: var(--space-6); }
+
+    .nav-label {
+      margin: 0 0 var(--space-2);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--color-text-faint);
+      font-size: var(--text-xs);
+    }
+
+    .nav-list {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 0.85rem 0.95rem;
+      border-radius: var(--radius-lg);
+      color: var(--color-text-muted);
+      border: 1px solid transparent;
+      transition: 180ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background: var(--color-primary-highlight);
+      color: var(--color-text);
+      border-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
+      transform: translateX(2px);
+    }
+
+    .sidebar-card {
+      padding: var(--space-4);
+      border-radius: var(--radius-xl);
+      background: var(--color-surface-2);
+      border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar-card h2 {
+      margin: 0 0 var(--space-2);
+      font: 700 var(--text-sm)/1.2 var(--font-display);
+    }
+
+    .sidebar-card p {
+      margin: 0 0 var(--space-3);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+
+    .main {
+      min-width: 0;
+      padding: var(--space-6);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      justify-content: space-between;
+      margin-bottom: var(--space-6);
+      padding: var(--space-4) var(--space-5);
+      min-height: var(--header-height);
+      border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
+      border-radius: calc(var(--radius-xl) + 4px);
+      background: color-mix(in oklab, var(--color-surface) 88%, transparent);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .topbar-copy h2 {
+      margin: 0;
+      font: 800 var(--text-xl)/1 var(--font-display);
+      letter-spacing: -0.04em;
+    }
+
+    .topbar-copy p {
+      margin: 0.25rem 0 0;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 1px solid color-mix(in oklab, var(--color-text) 12%, transparent);
+      background: var(--color-surface-2);
+      color: var(--color-text);
+      border-radius: var(--radius-md);
+      padding: 0.8rem 1rem;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: var(--text-sm);
+      font-weight: 600;
+      transition: 180ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: #fff;
+      border-color: color-mix(in oklab, var(--color-primary) 60%, black 10%);
+    }
+
+    .btn-primary:hover { background: var(--color-primary-hover); }
+    .btn-ghost { background: transparent; }
+
+    .page-grid {
+      display: grid;
+      gap: var(--space-6);
+    }
+
+    .hero {
+      display: grid;
+      gap: var(--space-6);
+      grid-template-columns: 1.3fr 0.9fr;
+      align-items: stretch;
+    }
+
+    .hero-card,
+    .panel {
+      background: var(--color-surface);
+      border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
+      border-radius: calc(var(--radius-xl) + 6px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero-card {
+      padding: clamp(1.5rem, 3vw, 2.5rem);
+      background:
+        radial-gradient(circle at top right, color-mix(in oklab, var(--color-primary) 22%, transparent), transparent 28%),
+        linear-gradient(180deg, color-mix(in oklab, var(--color-surface) 88%, var(--color-primary) 12%), var(--color-surface));
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.7rem;
+      border-radius: 999px;
+      background: color-mix(in oklab, var(--color-primary) 12%, var(--color-surface-2));
+      color: var(--color-primary);
+      font-size: var(--text-xs);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .hero-card h3 {
+      margin: var(--space-4) 0 var(--space-3);
+      font: 800 clamp(2rem, 1.2rem + 2vw, 3rem)/0.95 var(--font-display);
+      letter-spacing: -0.05em;
+      max-width: 14ch;
+    }
+
+    .hero-card p {
+      margin: 0 0 var(--space-6);
+      max-width: 58ch;
+      color: var(--color-text-muted);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+
+    .stat {
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      background: color-mix(in oklab, var(--color-surface-2) 88%, var(--color-primary) 12%);
+      border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
+    }
+
+    .stat strong {
+      display: block;
+      font: 800 var(--text-lg)/1 var(--font-display);
+      margin-bottom: var(--space-1);
+    }
+
+    .stat span {
+      color: var(--color-text-muted);
+      font-size: var(--text-xs);
+    }
+
+    .quick-actions {
+      padding: clamp(1.25rem, 2vw, 2rem);
+      display: grid;
+      gap: var(--space-4);
+      align-content: start;
+    }
+
+    .quick-actions h3,
+    .section-head h3 {
+      margin: 0;
+      font: 800 var(--text-lg)/1.1 var(--font-display);
+      letter-spacing: -0.03em;
+    }
+
+    .quick-actions p,
+    .section-head p {
+      margin: 0.35rem 0 0;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .mission-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-3);
+    }
+
+    .mission-btn {
+      text-align: left;
+      padding: var(--space-4);
+      min-height: 96px;
+      border-radius: var(--radius-lg);
+      border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
+      background: var(--color-surface-2);
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .mission-btn small { color: var(--color-text-muted); }
+
+    .panel {
+      padding: var(--space-5);
+      content-visibility: auto;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    .section-actions {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .cards-2,
+    .cards-3,
+    .cards-4 {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .cards-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cards-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .cards-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .subpanel {
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      border: 1px solid color-mix(in oklab, var(--color-text) 9%, transparent);
+      background: var(--color-surface-2);
+    }
+
+    .subpanel h4 {
+      margin: 0 0 var(--space-2);
+      font: 700 var(--text-sm)/1.2 var(--font-display);
+    }
+
+    .subpanel p,
+    .subpanel li {
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .field-grid {
+      display: grid;
+      gap: var(--space-4);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .field-grid-3 {
+      display: grid;
+      gap: var(--space-4);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .field {
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .field label {
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-faint);
+      font-weight: 700;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 0.9rem 0.95rem;
+      min-height: 44px;
+      border-radius: var(--radius-md);
+      border: 1px solid color-mix(in oklab, var(--color-text) 12%, transparent);
+      background: var(--color-surface);
+      color: var(--color-text);
+    }
+
+    .field textarea {
+      min-height: 108px;
+      resize: vertical;
+    }
+
+    .result-box,
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      background: color-mix(in oklab, var(--color-surface) 84%, var(--color-primary) 16%);
+      border: 1px solid color-mix(in oklab, var(--color-primary) 20%, transparent);
+      font-size: var(--text-sm);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+
+    .check-grid {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .check-item {
+      display: flex;
+      gap: var(--space-3);
+      align-items: start;
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
+      background: var(--color-surface-2);
+    }
+
+    .check-item input { margin-top: 0.3rem; }
+
+    .check-item strong {
+      display: block;
+      font-size: var(--text-sm);
+    }
+
+    .check-item span {
+      color: var(--color-text-muted);
+      font-size: var(--text-xs);
+    }
+
+    .incident-list,
+    .profile-list,
+    .wizard-list {
+      display: grid;
+      gap: var(--space-3);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .incident-item,
+    .profile-item,
+    .wizard-step {
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface-2);
+      border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
+    }
+
+    .incident-item strong,
+    .profile-item strong,
+    .wizard-step strong {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-size: var(--text-sm);
+    }
+
+    .meta-row {
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      color: var(--color-text-faint);
+      font-size: var(--text-xs);
+      margin-top: var(--space-2);
+    }
+
+    .video-patterns {
+      display: grid;
+      gap: var(--space-4);
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: start;
+    }
+
+    .canvas-wrap {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
+      background: #000;
+      box-shadow: var(--shadow-sm);
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      aspect-ratio: 16/9;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .tag {
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      font-size: var(--text-xs);
+      background: color-mix(in oklab, var(--color-surface-2) 80%, var(--color-primary) 20%);
+      color: var(--color-text);
+    }
+
+    .table-wrap { overflow: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+
+    th,
+    td {
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid color-mix(in oklab, var(--color-text) 9%, transparent);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--color-text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: var(--text-xs);
+    }
+
+    .footer-note {
+      color: var(--color-text-faint);
+      font-size: var(--text-xs);
+    }
+
+    .show-mode .sidebar { display: none; }
+    .show-mode .app-shell { grid-template-columns: 1fr; }
+    .show-mode .main { padding: var(--space-4); }
+    .show-mode .topbar { position: sticky; top: 0; }
+
+    .show-banner {
+      display: none;
+      margin-bottom: var(--space-4);
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius-md);
+      background: color-mix(in oklab, var(--color-warning) 18%, var(--color-surface));
+      border: 1px solid color-mix(in oklab, var(--color-warning) 28%, transparent);
+    }
+
+    .show-mode .show-banner { display: block; }
+
+    #fullscreen-canvas-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      z-index: 9999;
+      cursor: none;
+    }
+
+    #fullscreenCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .exit-hint {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: var(--text-xs);
+      color: white;
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+      z-index: 10000;
+    }
+
+    #fullscreen-canvas-container:hover .exit-hint {
+      opacity: 1;
+    }
+
+    .btn-danger {
+      background: var(--color-error);
+      color: #fff;
+      border-color: color-mix(in oklab, var(--color-error) 60%, black 10%);
+    }
+
+    .btn-danger:hover {
+      background: color-mix(in oklab, var(--color-error) 80%, black 20%);
+    }
+
+    @media (max-width: 1100px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: relative;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
+      }
+      .hero,
+      .video-patterns,
+      .cards-4,
+      .cards-3,
+      .cards-2,
+      .field-grid,
+      .field-grid-3 { grid-template-columns: 1fr; }
+      .stat-grid,
+      .mission-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 720px) {
+      .main,
+      .sidebar { padding: var(--space-4); }
+      .topbar { padding: var(--space-4); }
+      .topbar-actions { width: 100%; justify-content: stretch; }
+      .topbar-actions .btn { flex: 1 1 auto; }
+      .stat-grid,
+      .mission-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
 </head>
 <body>
+  <a href="#main" class="skip-link">Skip to content</a>
 
-    <header>
-        <div class="logo-section">
-            <!-- SVG AV Wave/Sync icon -->
-            <svg viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-            </svg>
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-label="AV Toolkit logo">
+            <path d="M5 17 10 7l4 10 5-10" />
+            <path d="M4 19h16" />
+          </svg>
+        </div>
+        <div class="brand-copy">
+          <h1>AV Toolkit</h1>
+          <p>Live event, corporate, audio, video, lighting, networking</p>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <i data-lucide="moon-star"></i>
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-label">Mission control</p>
+        <nav class="nav-list">
+          <a class="nav-link active" href="#dashboard"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+          <a class="nav-link" href="#profiles"><i data-lucide="folders"></i><span>Profiles</span></a>
+          <a class="nav-link" href="#audio"><i data-lucide="audio-lines"></i><span>Audio</span></a>
+          <a class="nav-link" href="#video"><i data-lucide="monitor-play"></i><span>Video</span></a>
+          <a class="nav-link" href="#lighting"><i data-lucide="lamp-floor"></i><span>Lighting</span></a>
+          <a class="nav-link" href="#network"><i data-lucide="network"></i><span>Networking</span></a>
+          <a class="nav-link" href="#ops"><i data-lucide="clipboard-check"></i><span>Ops</span></a>
+          <a class="nav-link" href="#troubleshooting"><i data-lucide="wrench"></i><span>Troubleshooting</span></a>
+        </nav>
+      </div>
+
+      <div class="sidebar-card">
+        <h2>Keyboard shortcuts</h2>
+        <p>Press 1-6 to jump sections, G for dashboard, and S to toggle Show Mode.</p>
+        <div class="tag-row">
+          <span class="tag">1 Audio</span>
+          <span class="tag">2 Video</span>
+          <span class="tag">3 Lighting</span>
+          <span class="tag">4 Network</span>
+          <span class="tag">5 Ops</span>
+          <span class="tag">6 Trouble</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main" id="main">
+      <header class="topbar">
+        <div class="topbar-copy">
+          <h2>Enhanced toolkit comparison build</h2>
+          <p>A single-file concept build that folds in dashboard, profiles, calculators, show mode, and exportable logs.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn" id="importBtn"><i data-lucide="upload"></i>Import Profile</button>
+          <input id="importFile" type="file" accept="application/json" hidden />
+          <button class="btn" id="exportProfileBtn"><i data-lucide="download"></i>Export Active Profile</button>
+          <button class="btn btn-primary" id="showModeBtn"><i data-lucide="presentation"></i>Toggle Show Mode</button>
+        </div>
+      </header>
+
+      <div class="show-banner">Show Mode is on. Sidebar is hidden and controls are optimized for fast navigation.</div>
+
+      <div class="page-grid">
+        <section id="dashboard" class="hero">
+          <article class="hero-card">
+            <span class="eyebrow"><i data-lucide="zap"></i>Room mission control</span>
+            <h3>One launcher for room prep, show checks, and failure triage.</h3>
+            <p>This comparison build keeps the spirit of your original toolkit while adding room profiles, fast calculators, lighting coverage, network utilities, and incident logging in one operational shell.</p>
+            <div class="stat-grid">
+              <div class="stat"><strong id="statProfiles">1</strong><span>Profiles loaded</span></div>
+              <div class="stat"><strong id="statChecks">0%</strong><span>Checklist completion</span></div>
+              <div class="stat"><strong id="statIncidents">0</strong><span>Logged incidents</span></div>
+            </div>
+          </article>
+
+          <aside class="hero-card quick-actions">
             <div>
-                <h1>AV LAB</h1>
-                <p style="font-size: 0.7rem; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase;">Corporate Suite</p>
+              <h3>Quick launch</h3>
+              <p>These tiles mimic the “grab it under pressure” layout for show-time use.</p>
             </div>
-        </div>
-        <div class="status-badge">
-            <div class="status-dot"></div>
-            <span>DSP Reference Standard: 48 kHz</span>
-        </div>
-    </header>
-
-    <div class="main-layout">
-        <!-- Sidebar Navigation -->
-        <div class="sidebar">
-            <button class="nav-btn active" onclick="switchTab('tab-generators')">
-                <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                Signal Generators
-            </button>
-            <button class="nav-btn" onclick="switchTab('tab-sync')">
-                <!-- SVG sync/latency icon -->
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                AV Sync / Lip-Sync
-            </button>
-            <button class="nav-btn" onclick="switchTab('tab-visual')">
-                <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
-                Display Calibration
-            </button>
-            <button class="nav-btn" onclick="switchTab('tab-webrtc')">
-                <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"/></svg>
-                Hardware Diagnostics
-            </button>
-            <button class="nav-btn" onclick="switchTab('tab-checklists')">
-                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                Tech Checklists
-            </button>
-            <button class="nav-btn" onclick="switchTab('tab-library')">
-                <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-                Troubleshooting Library
-            </button>
-            <button class="nav-btn" onclick="switchTab('tab-disclaimer')" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; color: var(--accent-rose);">
-                <svg viewBox="0 0 24 24" style="fill: currentColor; width: 1.25rem; height: 1.25rem;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                Disclaimer & EULA
-            </button>
-        </div>
-
-        <!-- Main Content Area -->
-        <div class="content-area">
-            <!-- Alert Box for Audio Init -->
-            <div class="alert-box" id="audio-init-alert">
-                <svg viewBox="0 0 24 24" style="width:1.5rem; height:1.5rem; fill:#f59e0b; flex-shrink:0;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                <div>
-                    <strong style="display:block; margin-bottom:0.2rem;">Web Audio Initialization Required</strong>
-                    Browsers block audio contexts from running before a user interaction. Click anywhere or toggle the Audio Generator below to enable room diagnostics audio.
-                </div>
+            <div class="mission-grid">
+              <button class="mission-btn" data-scroll="#audio"><strong>Audio</strong><small>Delay, line checks, speech tuning</small></button>
+              <button class="mission-btn" data-scroll="#video"><strong>Video</strong><small>Motion tests, safe areas, patterns</small></button>
+              <button class="mission-btn" data-scroll="#lighting"><strong>Lighting</strong><small>DMX patching and camera flicker notes</small></button>
+              <button class="mission-btn" data-scroll="#network"><strong>Network</strong><small>PoE, IGMP, multicast, uplink triage</small></button>
+              <button class="mission-btn" data-scroll="#ops"><strong>Ops</strong><small>Checklists, incidents, room reports</small></button>
+              <button class="mission-btn" data-scroll="#troubleshooting"><strong>Troubleshooting</strong><small>HDCP, EDID, AVoIP, room recoveries</small></button>
             </div>
+          </aside>
+        </section>
 
-            <!-- Tab: Generators -->
-            <div id="tab-generators" class="tab-panel active">
-                <div class="panel-header">
-                    <h2>Audio Signal Generators</h2>
-                    <p>Generate precise sine waveforms, channel sweeps, pink noise, and speaker polarity tests directly through your sound card.</p>
-                </div>
-
-                <div class="bento-grid">
-                    <!-- Tone Generator Card -->
-                    <div class="glass-card">
-                        <div class="card-title">
-                            <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                            Waveform Tone Generator
-                        </div>
-                        
-                        <div class="control-group">
-                            <div class="control-label">
-                                <span>Signal Type</span>
-                                <span id="lbl-wavetype" style="text-transform: capitalize; font-weight:600; color:var(--accent-cyan);">Sine</span>
-                            </div>
-                            <div class="btn-row" style="margin-bottom:1rem;">
-                                <button class="preset-badge active" id="btn-sine" onclick="setWaveType('sine')">Sine</button>
-                                <button class="preset-badge" id="btn-square" onclick="setWaveType('square')">Square</button>
-                                <button class="preset-badge" id="btn-triangle" onclick="setWaveType('triangle')">Triangle</button>
-                                <button class="preset-badge" id="btn-sawtooth" onclick="setWaveType('sawtooth')">Sawtooth</button>
-                            </div>
-                        </div>
-
-                        <div class="control-group">
-                            <div class="control-label">
-                                <span>Frequency</span>
-                                <span id="lbl-freq" style="font-weight:600; color:var(--accent-cyan);">1000 Hz</span>
-                            </div>
-                            <input type="range" class="slider-input" id="range-freq" min="20" max="20000" value="1000" oninput="updateFrequency(this.value)">
-                            <div class="btn-row" style="margin-top: 0.5rem;">
-                                <button class="preset-badge" onclick="setFrequencyPreset(100)">100 Hz</button>
-                                <button class="preset-badge" onclick="setFrequencyPreset(440)">440 Hz</button>
-                                <button class="preset-badge" onclick="setFrequencyPreset(1000)">1 kHz</button>
-                                <button class="preset-badge" onclick="setFrequencyPreset(10000)">10 kHz</button>
-                            </div>
-                        </div>
-
-                        <div class="control-group">
-                            <div class="control-label">
-                                <span>Output Gain</span>
-                                <span id="lbl-volume">50%</span>
-                            </div>
-                            <input type="range" class="slider-input" id="range-volume" min="0" max="100" value="50" oninput="updateVolume(this.value)">
-                        </div>
-
-                        <div class="btn-row" style="margin-top: 1.5rem;">
-                            <button class="btn btn-primary" id="btn-toggle-tone" onclick="toggleTone()" style="flex: 1;">▶ Start Tone</button>
-                        </div>
-                    </div>
-
-                    <!-- Noise & Calibration Tracks Card -->
-                    <div class="glass-card">
-                        <div class="card-title">
-                            <!-- SVG Waveform icon -->
-                            <svg viewBox="0 0 24 24"><path d="M20 12H4v2h16v-2zm0-4H4v2h16V8zm0 8H4v2h16v-2z"/></svg>
-                            Reference Noise & Diagnostics
-                        </div>
-                        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.2rem; line-height:1.4;">
-                            Use Voss-McCartney Pink Noise to calibrate Room EQs and Real-Time Analyzers (RTA). Toggle Channel Check to check speaker mappings.
-                        </p>
-
-                        <div class="control-group">
-                            <div class="control-label">Pink & White Noise</div>
-                            <div class="btn-row">
-                                <button class="btn" id="btn-noise-pink" onclick="toggleNoise('pink')" style="flex: 1;">Pink Noise</button>
-                                <button class="btn" id="btn-noise-white" onclick="toggleNoise('white')" style="flex: 1;">White Noise</button>
-                            </div>
-                        </div>
-
-                        <div class="control-group" style="margin-top:1.5rem;">
-                            <div class="control-label">Speaker Channel Routing Check</div>
-                            <div class="btn-row">
-                                <button class="btn" id="btn-channel-left" onclick="testChannel('left')" style="flex:1;">Left Only</button>
-                                <button class="btn" id="btn-channel-right" onclick="testChannel('right')" style="flex:1;">Right Only</button>
-                            </div>
-                        </div>
-
-                        <div class="control-group" style="margin-top:1.5rem;">
-                            <div class="control-label">Speaker Phase Polarity Check</div>
-                            <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.5rem; line-height:1.3;">
-                                Alternates tone between In-Phase (centered) and Out-of-Phase (inverted). If Out-of-Phase sounds identical or louder, your speaker wires are inverted!
-                            </p>
-                            <button class="btn" id="btn-phase-polarity" onclick="togglePhasePolarityCheck()" style="width:100%;">
-                                Check Speaker Polarity Phase
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        <section id="profiles" class="panel">
+          <div class="section-head">
+            <div>
+              <h3>Room profiles</h3>
+              <p>Create a reusable profile for a ballroom, boardroom, venue, or recurring client setup.</p>
             </div>
-
-            <!-- Tab: AV Sync Latency Tester -->
-            <div id="tab-sync" class="tab-panel">
-                <div class="panel-header">
-                    <h2>AV Lip-Sync Latency Tester</h2>
-                    <p>Interactively simulate and measure latency offsets between speakers and displays. Align the audio click with the center flash.</p>
-                </div>
-
-                <div class="sync-tester-display glass-card">
-                    <div class="sync-canvas-wrapper">
-                        <canvas id="sync-tester-canvas" width="600" height="260"></canvas>
-                    </div>
-
-                    <div class="bento-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); text-align: left;">
-                        <div class="glass-card" style="padding:1rem;">
-                            <div class="control-label">
-                                <span>Simulate Audio Offset</span>
-                                <span id="lbl-sync-delay" style="color:var(--accent-cyan); font-weight:600;">0 ms</span>
-                            </div>
-                            <input type="range" class="slider-input" id="range-sync-delay" min="-300" max="300" step="5" value="0" oninput="updateSyncDelay(this.value)">
-                            <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.5rem; line-height:1.3;">
-                                <strong>Negative (-)</strong>: Audio triggers *before* the sync flash.<br>
-                                <strong>Positive (+)</strong>: Audio triggers *after* the sync flash (typical DSP lag).
-                            </p>
-                        </div>
-
-                        <div class="glass-card" style="padding:1rem; display: flex; flex-direction: column; justify-content: center;">
-                            <div class="btn-row">
-                                <button class="btn btn-primary" id="btn-toggle-sync" onclick="toggleSyncTester()" style="flex:1;">▶ Run Sync Sweep</button>
-                                <button class="btn" onclick="resetSyncTester()" style="flex:0.5;">Reset</button>
-                            </div>
-                            <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.5rem; line-height:1.3; text-align: center;">
-                                Press <strong>spacebar</strong> to play/pause. Use this screen to verify local browser engine latency.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+            <div class="section-actions">
+              <button class="btn btn-primary" id="saveProfileBtn"><i data-lucide="save"></i>Save current profile</button>
+              <button class="btn" id="newProfileBtn"><i data-lucide="file-plus-2"></i>New blank profile</button>
             </div>
-
-            <!-- Tab: Visual Calibration -->
-            <div id="tab-visual" class="tab-panel">
-                <div class="panel-header">
-                    <h2>Display Calibration & Projector Convergence</h2>
-                    <p>Launch high-precision fullscreen vector test patterns to verify focus, aspect ratios, color alignment, and screen share compression artifacts.</p>
+          </div>
+          <div class="cards-2">
+            <div class="subpanel">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="profileName">Profile name</label>
+                  <input id="profileName" value="Default Room" />
                 </div>
-
-                <div class="calibration-grid">
-                    <div class="cal-item" onclick="launchCalibration('convergence')">
-                        <svg class="cal-item-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93h2c0 2.82 2.05 5.17 4.8 5.76v2.17zm1-2.17c2.75-.59 4.8-2.94 4.8-5.76h2c0 4.08-3.05 7.44-7 7.93v-2.17z"/></svg>
-                        <div class="cal-item-title">Convergence Grid</div>
-                        <div class="cal-item-desc">Corner alignment, focus, and 16:9 aspect circle check.</div>
-                    </div>
-
-                    <div class="cal-item" onclick="launchCalibration('legibility')">
-                        <svg class="cal-item-icon" viewBox="0 0 24 24"><path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"/></svg>
-                        <div class="cal-item-title">Legibility Chart</div>
-                        <div class="cal-item-desc">Font size check & chroma sub-sampling (red/blue on black).</div>
-                    </div>
-
-                    <div class="cal-item" onclick="launchCalibration('colorbars')">
-                        <svg class="cal-item-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"/></svg>
-                        <div class="cal-item-title">SMPTE Color Bars</div>
-                        <div class="cal-item-desc">Saturation, brightness and panel color accuracy verification.</div>
-                    </div>
-
-                    <div class="cal-item" onclick="launchCalibration('white')">
-                        <div class="cal-item-icon" style="background: white; border: 1px solid rgba(255,255,255,0.2); border-radius:4px; width:2rem; height:2rem;"></div>
-                        <div class="cal-item-title" style="margin-top:0.5rem;">Pure White Screen</div>
-                        <div class="cal-item-desc">Backlight bleed, dead pixels, and projector bulb uniformity.</div>
-                    </div>
-
-                    <div class="cal-item" onclick="launchCalibration('black')">
-                        <div class="cal-item-icon" style="background: #020617; border: 1px solid rgba(255,255,255,0.2); border-radius:4px; width:2rem; height:2rem;"></div>
-                        <div class="cal-item-title" style="margin-top:0.5rem;">Pure Black Screen</div>
-                        <div class="cal-item-desc">Verify display panel black level thresholds.</div>
-                    </div>
-
-                    <div class="cal-item" onclick="launchCalibration('rgb')">
-                        <svg class="cal-item-icon" viewBox="0 0 24 24"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10z"/></svg>
-                        <div class="cal-item-title">RGB Uniformity</div>
-                        <div class="cal-item-desc">Cyclic primary colors to audit pixel health.</div>
-                    </div>
+                <div class="field">
+                  <label for="profileClient">Client / venue</label>
+                  <input id="profileClient" placeholder="Acme keynote" />
                 </div>
+                <div class="field">
+                  <label for="profileResolution">Preferred output</label>
+                  <input id="profileResolution" value="1920x1080 @ 60Hz" />
+                </div>
+                <div class="field">
+                  <label for="profileCodec">Playback note</label>
+                  <input id="profileCodec" placeholder="ProRes 422 / H.264 fallback" />
+                </div>
+              </div>
+              <div class="field" style="margin-top: var(--space-4);">
+                <label for="profileNotes">Profile notes</label>
+                <textarea id="profileNotes" placeholder="Routing notes, DSP quirks, switch ports, PTZ IDs..."></textarea>
+              </div>
             </div>
-
-            <!-- Tab: Hardware Diagnostics -->
-            <div id="tab-webrtc" class="tab-panel">
-                <div class="panel-header">
-                    <h2>Live Hardware Diagnostics (Camera & Mic)</h2>
-                    <p>Test capture card latency, camera sightlines, and speakerphone microphone levels in real time directly inside the browser sandbox.</p>
-                </div>
-
-                <div class="bento-grid">
-                    <!-- Camera Input Card -->
-                    <div class="glass-card">
-                        <div class="card-title">
-                            <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-                            Video Diagnostics
-                        </div>
-                        <video class="video-preview" id="video-preview-el" autoplay playsinline></video>
-                        
-                        <label class="control-label" for="select-camera">Camera Input Device</label>
-                        <select id="select-camera" class="device-select" onchange="startCameraDiagnostics(this.value)">
-                            <option value="">Choose camera...</option>
-                        </select>
-                        <div class="btn-row">
-                            <button class="btn btn-primary" onclick="loadMediaDevices()" style="flex:1;">Refresh Devices</button>
-                        </div>
-                    </div>
-
-                    <!-- Microphone Input Card -->
-                    <div class="glass-card">
-                        <div class="card-title">
-                            <!-- SVG Mic icon -->
-                            <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
-                            Audio Input Diagnostics
-                        </div>
-                        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem; line-height:1.4;">
-                            Speak into the room microphones. Look for input response on the level meter below. Ensure signals do not red-line/clip.
-                        </p>
-                        
-                        <label class="control-label" for="select-mic">Microphone Input Device</label>
-                        <select id="select-mic" class="device-select" onchange="startMicrophoneDiagnostics(this.value)">
-                            <option value="">Choose microphone...</option>
-                        </select>
-
-                        <div class="vu-meter-container">
-                            <div class="vu-label">
-                                <span>Input Volume (VU)</span>
-                                <span class="vu-value" id="lbl-vu-db">-inf dB</span>
-                            </div>
-                            <div class="vu-bar-wrapper">
-                                <div class="vu-bar" id="vu-bar-fill"></div>
-                            </div>
-                        </div>
-
-                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:1rem; line-height:1.3;">
-                            Teams/Zoom utilize Acoustic Echo Cancellation (AEC). If input mirrors output speakers on a call, AEC is failing in the hardware DSP.
-                        </p>
-                    </div>
-                </div>
+            <div class="subpanel">
+              <h4>Saved profiles</h4>
+              <ul class="profile-list" id="profileList"></ul>
             </div>
+          </div>
+        </section>
 
-            <!-- Tab: Checklists -->
-            <div id="tab-checklists" class="tab-panel">
-                <div class="panel-header">
-                    <h2>Operational AV Checklists</h2>
-                    <p>Complete your room checks digitally. Progress is auto-saved locally. Export a compliance run-sheet when finished.</p>
-                </div>
-
-                <div class="checklist-tabs">
-                    <button class="btn active" id="btn-chk-mtr" onclick="switchChecklist('mtr')">Daily Zoom/MTR Walkthrough</button>
-                    <button class="btn" id="btn-chk-event" onclick="switchChecklist('event')">Pre-Event Technician Checklist</button>
-                </div>
-
-                <div class="glass-card" style="margin-bottom:1.5rem;">
-                    <div id="chk-group-mtr" class="checklist-group">
-                        <div class="checklist-item" onclick="toggleCheckItem(this, 'mtr-1')">
-                            <input type="checkbox" id="mtr-1" onclick="event.stopPropagation(); saveCheckState();">
-                            <div>
-                                <span class="checklist-badge badge-critical">Tablet</span>
-                                <div class="checklist-text">Controller Tablet Powered & charging, correct local time displayed.</div>
-                            </div>
-                        </div>
-                        <div class="checklist-item" onclick="toggleCheckItem(this, 'mtr-2')">
-                            <input type="checkbox" id="mtr-2" onclick="event.stopPropagation(); saveCheckState();">
-                            <div>
-                                <span class="checklist-badge badge-critical">Audio</span>
-                                <div class="checklist-text">DSP Mute Sync Verification: Tablet mute triggers red LEDs on physical room microphones.</div>
-                            </div>
-                        </div>
-                        <div class="checklist-item" onclick="toggleCheckItem(this, 'mtr-3')">
-                            <input type="checkbox" id="mtr-3" onclick="event.stopPropagation(); saveCheckState();">
-                            <div>
-                                <span class="checklist-badge badge-standard">Speakers</span>
-                                <div class="checklist-text">Trigger audio test ringtone. Verify clear sound across all speaker arrays.</div>
-                            </div>
-                        </div>
-                        <div class="checklist-item" onclick="toggleCheckItem(this, 'mtr-4')">
-                            <input type="checkbox" id="mtr-4" onclick="event.stopPropagation(); saveCheckState();">
-                            <div>
-                                <span class="checklist-badge badge-standard">Camera</span>
-                                <div class="checklist-text">Test PTZ camera controls, verify presets (Whiteboard, Podium, Room overview).</div>
-                            </div>
-                        </div>
-                        <div class="checklist-item" onclick="toggleCheckItem(this, 'mtr-5')">
-                            <input type="checkbox" id="mtr-5" onclick="event.stopPropagation(); saveCheckState();">
-                            <div>
-                                <span class="checklist-badge badge-physical">Cabling</span>
-                                <div class="checklist-text">Examine table HDMI/USB-C cables. Verify retractors slide back smoothly.</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="chk-group-event" class="checklist-group" style="display:none;">
-                        <div class="checklist-item" onclick="toggleCheckItem(this, 'event-1')">
-                            <input type="checkbox" id="event-1" onclick="event.stopPropagation(); saveCheckState();">
-                            <div>
-                                <span class="checklist-badge badge-critical">Safety</span>
-                                <div class="checklist-text">Sightlines checked, floor cables taped down securely with gaffer tape.</div>
-                            </div>
-                        </div>
-                        <div class="checklist-item" onclick="toggleCheckItem(this, 'event-2')">
-                            <input type="checkbox" id="event-2" onclick="event.stopPropagation(); saveCheckState();">
-                            <div>
-                                <span class="checklist-badge badge-critical">Batteries</span>
-                                <div class="checklist-text">Check lapel/wireless mic batteries. Replace if charge is under 2 bars.</div>
-                            </div>
-                        </div>
-                        <div class="checklist-item" onclick="toggleCheckItem(this, 'event-3')">
-                            <input type="checkbox" id="event-3" onclick="event.stopPropagation(); saveCheckState();">
-                            <div>
-                                <span class="checklist-badge badge-standard">Audio Gain</span>
-                                <div class="checklist-text">Perform physical mic walk-test to back corners, listening for RF drops/static.</div>
-                            </div>
-                        </div>
-                        <div class="checklist-item" onclick="toggleCheckItem(this, 'event-4')">
-                            <input type="checkbox" id="event-4" onclick="event.stopPropagation(); saveCheckState();">
-                            <div>
-                                <span class="checklist-badge badge-physical">laptop Settings</span>
-                                <div class="checklist-text">Laptop Focus Assist (Do Not Disturb) enabled. Sleep timers disabled. AC power connected.</div>
-                            </div>
-                        </div>
-                        <div class="checklist-item" onclick="toggleCheckItem(this, 'event-5')">
-                            <input type="checkbox" id="event-5" onclick="event.stopPropagation(); saveCheckState();">
-                            <div>
-                                <span class="checklist-badge badge-standard">Confidence Monitor</span>
-                                <div class="checklist-text">Verify stage confidence monitor is in "Presenter View" (slides, notes, timer).</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="btn-row" style="margin-top:2rem;">
-                        <button class="btn btn-primary" onclick="generateChecklistReport()">Generate Run-Sheet Report</button>
-                        <button class="btn" onclick="clearChecklistStates()">Reset Checklists</button>
-                    </div>
-                </div>
+        <section id="audio" class="panel">
+          <div class="section-head">
+            <div>
+              <h3>Audio tools</h3>
+              <p>Expand the current generators with alignment, line-check, and quick tuning helpers.</p>
             </div>
-
-            <!-- Tab: Troubleshooting Library -->
-            <div id="tab-library" class="tab-panel">
-                <div class="panel-header">
-                    <h2>Troubleshooting Library & Reference</h2>
-                    <p>Quick operational guidelines for resolving common boardroom hardware, EDID, HDCP, and networked audio errors.</p>
-                </div>
-
-                <div class="lib-grid">
-                    <div class="glass-card">
-                        <div class="lib-section">
-                            <div class="lib-subtitle">EDID Handshake Failures</div>
-                            <div class="lib-text">
-                                <strong>Symptoms:</strong> Display reports "No Signal", resolution is stretched or blurry.<br>
-                                <strong>Fixes:</strong> Force laptop output resolution manually to <span class="lib-code">1920x1080 @ 60Hz</span>. On professional switchers (Crestron/Extron), set input EDID profiles to "Static" rather than "Dynamic". Power cycle the switch to force a fresh HDMI handshake.
-                            </div>
-                        </div>
-
-                        <div class="lib-section">
-                            <div class="lib-subtitle">HDCP Copyright Blocks</div>
-                            <div class="lib-text">
-                                <strong>Symptoms:</strong> Laptop desktop is visible, but opening YouTube or training videos shows a completely black video block (audio plays).<br>
-                                <strong>Fixes:</strong> Disabling HDCP on professional switcher input ports forces the laptop browser to output standard unencrypted resolution instead of blocking the stream. Avoid daisy-chaining capture cards on the main display path.
-                            </div>
-                        </div>
-
-                        <div class="lib-section">
-                            <div class="lib-subtitle">Dante Networked Audio Dropouts</div>
-                            <div class="lib-text">
-                                <strong>Symptoms:</strong> Audio completely drops out after exactly 2 to 5 minutes.<br>
-                                <strong>Root Cause:</strong> IGMP snooping is active on the network switch but **no IGMP Querier** is running. The switch terminates multicast streams when tables expire.<br>
-                                <strong>Fixes:</strong> Enable IGMP Querier on the AV VLAN switch settings. Disable Energy Efficient Ethernet (EEE / 802.3az) on all AV network ports to prevent clock synchronization jitters.
-                            </div>
-                        </div>
-
-                        <div class="lib-section">
-                            <div class="lib-subtitle">AV-over-IP Stream Stuttering</div>
-                            <div class="lib-text">
-                                <strong>Symptoms:</strong> Video stream freezes, displays digital noise, or projector drops connection.<br>
-                                <strong>Fixes:</strong> Enable **Jumbo Frames** (MTU 9000) on the switches to prevent AVoIP packet fragmentation. Ensure switch interconnect links (uplinks) have at least 10 Gbps capacity or use Link Aggregation (LAG).
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="section-actions" style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: var(--space-2); background: var(--color-surface-2); padding: 0.5rem var(--space-3); border-radius: var(--radius-md); border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);">
+                <label for="audioVolume" style="font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-faint); margin: 0; display: inline-flex; align-items: center; gap: 0.25rem;">
+                  <i data-lucide="volume-2" style="width: 14px; height: 14px;"></i>
+                  <span>Vol: <span id="volumeVal">50%</span></span>
+                </label>
+                <input id="audioVolume" type="range" min="0" max="100" value="50" style="width: 100px; height: 6px; padding: 0; cursor: pointer; -webkit-appearance: none; background: var(--color-border); border-radius: 999px;" />
+              </div>
+              <button class="btn btn-danger" id="stopAudioBtn"><i data-lucide="square"></i>Stop Audio</button>
             </div>
-
-            <!-- Tab: Disclaimer & EULA -->
-            <div id="tab-disclaimer" class="tab-panel">
-                <div class="panel-header">
-                    <h2>Disclaimer & EULA</h2>
-                    <p>End-User License Agreement and liability terms for the Corporate AV Testing & Calibration Toolkit.</p>
-                </div>
-
-                <div class="glass-card" style="max-width: 800px; margin: 0 auto; line-height: 1.6; color: var(--text-secondary);">
-                    <h3 style="font-family: var(--font-display); color: var(--accent-rose); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <svg viewBox="0 0 24 24" style="width: 1.5rem; height: 1.5rem; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                        Important Legal Notice
-                    </h3>
-                    <p style="margin-bottom: 1rem;">
-                        This Corporate AV Testing & Calibration Toolkit (hereafter "the Software"), including all interactive web pages, audio generators, calibration graphics, video clips, checklists, guides, and Python scripts, is provided in good faith for system validation, education, and tuning purposes.
-                    </p>
-                    <h4 style="color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 0.5rem; font-family: var(--font-display);">No Warranty or Guarantee</h4>
-                    <p style="margin-bottom: 1rem;">
-                        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-                    </p>
-                    <h4 style="color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 0.5rem; font-family: var(--font-display);">Operational Cautions</h4>
-                    <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; list-style-type: disc;">
-                        <li><strong>Audio sweeps and tones:</strong> High-frequency sweeps and reference tones can cause permanent hearing damage or damage speaker elements if played at excessive volumes. Always begin tests at minimum volume and increase level incrementally.</li>
-                        <li><strong>Network diagnostic scripts:</strong> Running automated ping sweeps or packet tests can trigger security alerts or saturate low-bandwidth links in corporate environments. Run only with appropriate administrative authorization.</li>
-                        <li><strong>Display convergence patterns:</strong> Do not leave static, high-contrast calibration grids on OLED or plasma displays for extended periods to avoid burn-in risks.</li>
-                    </ul>
-                    <p style="font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; color: var(--text-secondary); font-style: italic;">
-                        By using this toolkit or any of its components, you acknowledge that you have read, understood, and agreed to these terms, and that you are using them at your own risk.
-                    </p>
-                </div>
+          </div>
+          <div class="cards-4">
+            <div class="subpanel">
+              <h4>Distance to delay</h4>
+              <div class="field-grid">
+                <div class="field"><label for="distanceMeters">Distance (meters)</label><input id="distanceMeters" type="number" value="12" min="0" step="0.1" /></div>
+                <div class="field"><label for="speedOfSound">Speed of sound</label><input id="speedOfSound" type="number" value="343" min="1" /></div>
+              </div>
+              <div class="toolbar"><button class="btn btn-primary" id="calcDelayBtn">Calculate</button></div>
+              <p class="result-box" id="delayResult">Delay result will appear here.</p>
             </div>
-        </div>
-    </div>
-
-    <!-- Fullscreen Calibration Container -->
-    <div id="fullscreen-canvas-container">
-        <div class="exit-hint">Press <strong>ESC</strong> to exit calibration mode</div>
-        <canvas id="cal-canvas"></canvas>
-    </div>
-
-    <!-- Checklist Report Modal -->
-    <div class="report-modal" id="report-modal-el">
-        <div class="report-content">
-            <h3 style="font-family: var(--font-display); margin-bottom:0.5rem; color:var(--text-primary);">Compliance Run-Sheet Report</h3>
-            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem;">Copy this verification log to paste into event tickets or team chats.</p>
-            <textarea class="report-textarea" id="report-text-output" readonly></textarea>
-            <div class="btn-row" style="justify-content:flex-end;">
-                <button class="btn btn-primary" onclick="copyReportText()">Copy to Clipboard</button>
-                <button class="btn" onclick="closeReportModal()">Close</button>
+            <div class="subpanel">
+              <h4>Speech tuning macro</h4>
+              <p>Use these as placeholders for the real generators already in your app.</p>
+              <div class="toolbar">
+                <button class="btn macro-btn" data-sound="speech" data-macro="Band-limited pink noise from 125 Hz to 8 kHz for speech EQ.">Speech tuning</button>
+                <button class="btn macro-btn" data-sound="lowend" data-macro="Low-end rumble check around 40-100 Hz.">Low-end check</button>
+                <button class="btn macro-btn" data-sound="feedback" data-macro="Slow feedback hunt sweep through 500 Hz to 6 kHz.">Feedback hunt</button>
+              </div>
+              <p class="result-box" id="macroResult">Select a macro to preview operator notes.</p>
             </div>
-        </div>
-    </div>
+            <div class="subpanel">
+              <h4>Line check runner</h4>
+              <div class="field-grid-3">
+                <button class="btn line-btn" data-line="Left">Left</button>
+                <button class="btn line-btn" data-line="Right">Right</button>
+                <button class="btn line-btn" data-line="Sub">Sub</button>
+                <button class="btn line-btn" data-line="Fill 1">Fill 1</button>
+                <button class="btn line-btn" data-line="Fill 2">Fill 2</button>
+                <button class="btn line-btn" data-line="Lobby">Lobby</button>
+              </div>
+              <div class="toolbar"><button class="btn" id="clearLineLogBtn">Clear line log</button></div>
+              <pre id="lineCheckLog">No line checks yet.</pre>
+            </div>
+            <div class="subpanel">
+              <h4>Manual signal generator</h4>
+              <div class="field">
+                <label for="manualWaveform">Waveform</label>
+                <select id="manualWaveform">
+                  <option value="sine" selected>Sine wave</option>
+                  <option value="triangle">Triangle wave</option>
+                  <option value="sawtooth">Sawtooth wave</option>
+                  <option value="square">Square wave</option>
+                  <option value="pink">Pink noise</option>
+                </select>
+              </div>
+              <div class="field" style="margin-top: var(--space-3);">
+                <label for="manualFreq">Frequency: <span id="manualFreqVal">1000 Hz</span></label>
+                <input id="manualFreq" type="range" min="20" max="20000" value="1000" style="width: 100%; height: 6px; padding: 0; cursor: pointer; -webkit-appearance: none; background: var(--color-border); border-radius: 999px;" />
+              </div>
+              <div class="tag-row" style="margin-top: var(--space-2); margin-bottom: var(--space-3);">
+                <button class="tag" style="cursor: pointer; border: none;" data-freq-preset="100">100 Hz</button>
+                <button class="tag" style="cursor: pointer; border: none;" data-freq-preset="440">440 Hz</button>
+                <button class="tag" style="cursor: pointer; border: none;" data-freq-preset="1000">1 kHz</button>
+                <button class="tag" style="cursor: pointer; border: none;" data-freq-preset="10000">10 kHz</button>
+              </div>
+              <div class="toolbar">
+                <button class="btn btn-primary" id="playManualBtn">▶ Start Generator</button>
+              </div>
+            </div>
+          </div>
+        </section>
 
-    <script>
-        // Tab switching
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            document.getElementById(tabId).classList.add('active');
-            
-            // Highlight button
-            const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => {
-                return btn.getAttribute('onclick').includes(tabId);
-            });
-            if (activeBtn) activeBtn.classList.add('active');
+        <section id="video" class="panel">
+          <div class="section-head">
+            <div>
+              <h3>Video and display</h3>
+              <p>Add frame-rate sanity patterns, operator framing guides, and a visual test surface for motion and scaling artifacts.</p>
+            </div>
+          </div>
+          <div class="video-patterns">
+            <div class="canvas-wrap">
+              <canvas id="patternCanvas" width="1280" height="720" aria-label="Video test pattern canvas"></canvas>
+            </div>
+            <div class="subpanel">
+              <h4>Pattern controls</h4>
+              <div class="field">
+                <label for="patternSelect">Pattern</label>
+                <select id="patternSelect">
+                  <option value="bars">Color bars + safe area</option>
+                  <option value="grid">Convergence grid</option>
+                  <option value="motion">Motion bar</option>
+                  <option value="framing">Camera framing overlay</option>
+                  <option value="white">Solid White (brightness check)</option>
+                  <option value="black">Solid Black (leak/contrast check)</option>
+                  <option value="rgb">RGB Color Cycle (pixel audit)</option>
+                </select>
+              </div>
+              <div class="field" style="margin-top: var(--space-4);">
+                <label for="frameRateSelect">Motion reference</label>
+                <select id="frameRateSelect">
+                  <option>23.98 fps</option>
+                  <option>29.97 fps</option>
+                  <option>50 fps</option>
+                  <option selected>59.94 fps</option>
+                </select>
+              </div>
+              <div class="toolbar">
+                <button class="btn btn-primary" id="drawPatternBtn">Draw pattern</button>
+                <button class="btn" id="animatePatternBtn">Animate motion</button>
+                <button class="btn btn-primary" id="fullscreenPatternBtn"><i data-lucide="maximize"></i>Go Fullscreen</button>
+              </div>
+              <p class="result-box">Use the moving bar mode to spot stutter, frame conversion, and display processing lag.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="lighting" class="panel">
+          <div class="section-head">
+            <div>
+              <h3>Lighting tools</h3>
+              <p>Patch fixtures faster, prep for camera flicker, and add lighting checks to the same room workflow.</p>
+            </div>
+          </div>
+          <div class="cards-2">
+            <div class="subpanel">
+              <h4>DMX address calculator</h4>
+              <div class="field-grid">
+                <div class="field"><label for="dmxUniverse">Universe</label><input id="dmxUniverse" type="number" value="1" min="1" max="99" /></div>
+                <div class="field"><label for="dmxStart">Start address</label><input id="dmxStart" type="number" value="1" min="1" max="512" /></div>
+                <div class="field"><label for="dmxFootprint">Channels / fixture</label><input id="dmxFootprint" type="number" value="16" min="1" max="512" /></div>
+                <div class="field"><label for="dmxCount">Fixture count</label><input id="dmxCount" type="number" value="6" min="1" max="128" /></div>
+              </div>
+              <div class="toolbar">
+                <button class="btn btn-primary" id="dmxCalcBtn">Generate patch</button>
+                <button class="btn" id="dmxExportBtn">Export CSV</button>
+              </div>
+              <pre id="dmxResults">DMX patch output will appear here.</pre>
+            </div>
+            <div class="subpanel">
+              <h4>Camera and flicker notes</h4>
+              <ul>
+                <li>Verify shutter angle / shutter speed against mains frequency before blaming the fixture.</li>
+                <li>Check projection wash with house lights at presenter level, not just full on / full off.</li>
+                <li>Store preferred stage look notes in the room profile so recurring gigs start from a known baseline.</li>
+              </ul>
+              <div class="field" style="margin-top: var(--space-4);">
+                <label for="cctTarget">Target white point note</label>
+                <input id="cctTarget" value="3200K stage / 5600K camera" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="network" class="panel">
+          <div class="section-head">
+            <div>
+              <h3>Networking and AVoIP</h3>
+              <p>Turn static troubleshooting guidance into calculators and guided triage steps.</p>
+            </div>
+          </div>
+          <div class="cards-3">
+            <div class="subpanel">
+              <h4>PoE budget calculator</h4>
+              <div class="field"><label for="poeCapacity">Switch PoE capacity (W)</label><input id="poeCapacity" type="number" value="370" /></div>
+              <div class="field" style="margin-top: var(--space-4);">
+                <label for="poeDevices">Devices</label>
+                <textarea id="poeDevices">PTZ Cam 1, 15
+PTZ Cam 2, 15
+Ceiling Mic Array, 12
+DSP, 25
+Touch Panel, 7</textarea>
+              </div>
+              <div class="toolbar"><button class="btn btn-primary" id="poeCalcBtn">Calculate budget</button></div>
+              <p class="result-box" id="poeSummary">PoE summary will appear here.</p>
+            </div>
+            <div class="subpanel">
+              <h4>IGMP / multicast wizard</h4>
+              <div class="field">
+                <label for="networkSymptom">Observed symptom</label>
+                <select id="networkSymptom">
+                  <option value="drop">Audio drops after 2-5 minutes</option>
+                  <option value="freeze">Video freezes or packet artifacts</option>
+                  <option value="black">Black video from content playback</option>
+                  <option value="signal">No signal / blurry output</option>
+                </select>
+              </div>
+              <div class="toolbar"><button class="btn btn-primary" id="wizardBtn">Generate steps</button></div>
+              <ul class="wizard-list" id="wizardList"></ul>
+            </div>
+            <div class="subpanel">
+              <h4>AV network crib sheet</h4>
+              <div class="field-grid">
+                <div class="field"><label for="vlanId">AV VLAN</label><input id="vlanId" value="30" /></div>
+                <div class="field"><label for="subnetRange">Subnet</label><input id="subnetRange" value="10.30.0.0/24" /></div>
+              </div>
+              <div class="toolbar"><button class="btn" id="cribBtn">Generate crib sheet</button></div>
+              <pre id="cribSheet">VLAN notes will appear here.</pre>
+            </div>
+          </div>
+        </section>
+
+        <section id="ops" class="panel">
+          <div class="section-head">
+            <div>
+              <h3>Operations</h3>
+              <p>Keep checklist progress, incidents, and a room-ready export in one place.</p>
+            </div>
+            <div class="section-actions">
+              <button class="btn" id="exportChecklistBtn"><i data-lucide="file-down"></i>Export room report</button>
+            </div>
+          </div>
+          <div class="cards-2">
+            <div class="subpanel">
+              <h4>Room checklist</h4>
+              <div class="check-grid" id="checklistGrid"></div>
+            </div>
+            <div class="subpanel">
+              <h4>Incident log</h4>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="incidentCategory">Category</label>
+                  <select id="incidentCategory">
+                    <option>Audio</option>
+                    <option>Video</option>
+                    <option>Lighting</option>
+                    <option>Network</option>
+                    <option>Ops</option>
+                  </select>
+                </div>
+                <div class="field"><label for="incidentOwner">Owner</label><input id="incidentOwner" placeholder="FOH / A2 / TD" /></div>
+              </div>
+              <div class="field" style="margin-top: var(--space-4);">
+                <label for="incidentNotes">Notes</label>
+                <textarea id="incidentNotes" placeholder="What happened, what you changed, and what fixed it."></textarea>
+              </div>
+              <div class="toolbar">
+                <button class="btn btn-primary" id="addIncidentBtn">Add incident</button>
+                <button class="btn" id="clearIncidentBtn">Clear log</button>
+              </div>
+              <ul class="incident-list" id="incidentList"></ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="troubleshooting" class="panel">
+          <div class="section-head">
+            <div>
+              <h3>Troubleshooting library</h3>
+              <p>Interactive versions of the operational issues that matter most in boardrooms and event spaces.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Symptom</th>
+                  <th>Likely root cause</th>
+                  <th>Recommended first actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>No signal or blurry output</td>
+                  <td>Bad handshake, wrong laptop resolution, unstable EDID</td>
+                  <td>Force 1080p60, set switcher EDID to static, re-handshake the input path.</td>
+                </tr>
+                <tr>
+                  <td>Desktop visible but streaming video black</td>
+                  <td>HDCP path issue or encrypted playback over unsupported chain</td>
+                  <td>Disable HDCP where appropriate, simplify the display path, avoid unnecessary inline capture devices.</td>
+                </tr>
+                <tr>
+                  <td>Audio dies after a few minutes</td>
+                  <td>IGMP snooping with no querier, or power-saving features hurting timing</td>
+                  <td>Enable IGMP querier, disable EEE, verify multicast is intentionally handled.</td>
+                </tr>
+                <tr>
+                  <td>AVoIP freezes or packet corruption</td>
+                  <td>Insufficient uplink bandwidth, MTU mismatch, or packet fragmentation</td>
+                  <td>Confirm 10Gb uplinks where needed, align jumbo frame settings, verify port membership and QoS policy.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="footer-note">This section is intentionally concise here because the app is meant to turn these into faster operator workflows, not just static notes.</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Fullscreen Calibration Container -->
+  <div id="fullscreen-canvas-container">
+    <div class="exit-hint">Press <strong>ESC</strong> or Click to exit fullscreen pattern</div>
+    <canvas id="fullscreenCanvas"></canvas>
+  </div>
+
+  <script>
+    const state = {
+      profiles: [
+        {
+          id: crypto.randomUUID(),
+          name: 'Default Room',
+          client: 'Internal Demo',
+          resolution: '1920x1080 @ 60Hz',
+          codec: 'H.264 high profile / ProRes playback note',
+          notes: 'Baseline profile for comparing the enhanced toolkit shell.'
         }
+      ],
+      activeProfileId: null,
+      incidents: [],
+      lineChecks: [],
+      checklist: [
+        { id: 'display', label: 'Display path verified', note: 'Correct source visible, aspect ratio right, no black playback.' },
+        { id: 'audio', label: 'Audio line check complete', note: 'L/R/sub/fills confirmed and clean.' },
+        { id: 'network', label: 'AV network healthy', note: 'IGMP, uplinks, PoE, and switch role checked.' },
+        { id: 'lighting', label: 'Lighting camera-safe', note: 'Flicker and wash validated with actual camera exposure.' },
+        { id: 'record', label: 'Incident / notes exported', note: 'Room report ready for PM or client handoff.' }
+      ].map(item => ({ ...item, checked: false })),
+      showMode: false,
+      animationFrame: null,
+      rgbInterval: null,
+      rgbCycleIndex: 0,
+      audioCtx: null,
+      activeOscillator: null,
+      activeNoiseSource: null,
+      activeGainNode: null,
+      activePanner: null,
+      sweepInterval: null,
+      activeSoundId: null,
+      volume: 0.5
+    };
 
-        // Web Audio Context setup
-        let audioCtx = null;
-        let toneOscillator = null;
-        let toneGainNode = null;
-        let activeNoiseSource = null;
-        let activeNoiseGain = null;
-        let activeChannelNode = null;
-        let microphoneStream = null;
-        let micSource = null;
-        let micAnalyser = null;
-        let vuAnimationId = null;
+    state.activeProfileId = state.profiles[0].id;
 
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                document.getElementById('audio-init-alert').style.display = 'none';
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+    const $ = selector => document.querySelector(selector);
+    const $$ = selector => Array.from(document.querySelectorAll(selector));
+
+    function initIcons() {
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function setTheme(next) {
+      document.documentElement.setAttribute('data-theme', next);
+      $('#themeToggle').innerHTML = next === 'dark'
+        ? '<i data-lucide="sun-medium"></i>'
+        : '<i data-lucide="moon-star"></i>';
+      initIcons();
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    function scrollToSection(id) {
+      const el = document.querySelector(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function exportBlob(filename, content, type = 'application/json') {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function getActiveProfile() {
+      return state.profiles.find(p => p.id === state.activeProfileId) || state.profiles[0];
+    }
+
+    function loadProfileToForm(profile) {
+      if (!profile) return;
+      $('#profileName').value = profile.name || '';
+      $('#profileClient').value = profile.client || '';
+      $('#profileResolution').value = profile.resolution || '';
+      $('#profileCodec').value = profile.codec || '';
+      $('#profileNotes').value = profile.notes || '';
+    }
+
+    function collectProfileFromForm() {
+      return {
+        id: state.activeProfileId || crypto.randomUUID(),
+        name: $('#profileName').value.trim() || 'Untitled Profile',
+        client: $('#profileClient').value.trim(),
+        resolution: $('#profileResolution').value.trim(),
+        codec: $('#profileCodec').value.trim(),
+        notes: $('#profileNotes').value.trim()
+      };
+    }
+
+    function saveCurrentProfile() {
+      const profile = collectProfileFromForm();
+      const idx = state.profiles.findIndex(p => p.id === profile.id);
+      if (idx >= 0) state.profiles[idx] = profile;
+      else state.profiles.push(profile);
+      state.activeProfileId = profile.id;
+      renderProfiles();
+      updateStats();
+      saveStateToLocalStorage();
+    }
+
+    function newBlankProfile() {
+      const blank = {
+        id: crypto.randomUUID(),
+        name: 'New Room',
+        client: '',
+        resolution: '1920x1080 @ 60Hz',
+        codec: '',
+        notes: ''
+      };
+      state.profiles.push(blank);
+      state.activeProfileId = blank.id;
+      loadProfileToForm(blank);
+      renderProfiles();
+      updateStats();
+      saveStateToLocalStorage();
+    }
+
+    function renderProfiles() {
+      const list = $('#profileList');
+      list.innerHTML = '';
+      state.profiles.forEach(profile => {
+        const li = document.createElement('li');
+        li.className = 'profile-item';
+        li.innerHTML = `
+          <strong>${profile.name}</strong>
+          <div>${profile.client || 'No client specified'}</div>
+          <div class="meta-row">
+            <span>${profile.resolution || 'No output set'}</span>
+            <span>${profile.codec || 'No codec note'}</span>
+          </div>
+          <div class="toolbar">
+            <button class="btn" data-profile-load="${profile.id}">Load</button>
+            <button class="btn" data-profile-delete="${profile.id}">Delete</button>
+          </div>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function renderChecklist() {
+      const grid = $('#checklistGrid');
+      grid.innerHTML = '';
+      state.checklist.forEach(item => {
+        const wrapper = document.createElement('label');
+        wrapper.className = 'check-item';
+        wrapper.innerHTML = `
+          <input type="checkbox" ${item.checked ? 'checked' : ''} data-check-id="${item.id}" />
+          <span>
+            <strong>${item.label}</strong>
+            <span>${item.note}</span>
+          </span>
+        `;
+        grid.appendChild(wrapper);
+      });
+    }
+
+    function addIncident() {
+      const notes = $('#incidentNotes').value.trim();
+      if (!notes) return;
+      state.incidents.unshift({
+        id: crypto.randomUUID(),
+        category: $('#incidentCategory').value,
+        owner: $('#incidentOwner').value.trim() || 'Unassigned',
+        notes,
+        timestamp: new Date().toLocaleString()
+      });
+      $('#incidentNotes').value = '';
+      renderIncidents();
+      updateStats();
+      saveStateToLocalStorage();
+    }
+
+    function renderIncidents() {
+      const list = $('#incidentList');
+      list.innerHTML = '';
+      if (!state.incidents.length) {
+        const li = document.createElement('li');
+        li.className = 'incident-item';
+        li.innerHTML = '<strong>No incidents yet</strong><div>Use this log for show notes, client handoff, and recurring room quirks.</div>';
+        list.appendChild(li);
+        return;
+      }
+      state.incidents.forEach(inc => {
+        const li = document.createElement('li');
+        li.className = 'incident-item';
+        li.innerHTML = `
+          <strong>${inc.category} · ${inc.owner}</strong>
+          <div>${inc.notes}</div>
+          <div class="meta-row"><span>${inc.timestamp}</span></div>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function updateStats() {
+      $('#statProfiles').textContent = String(state.profiles.length);
+      const complete = state.checklist.filter(item => item.checked).length;
+      const percent = Math.round((complete / state.checklist.length) * 100);
+      $('#statChecks').textContent = `${percent}%`;
+      $('#statIncidents').textContent = String(state.incidents.length);
+    }
+
+    function calculateDelay() {
+      const distance = parseFloat($('#distanceMeters').value || '0');
+      const speed = parseFloat($('#speedOfSound').value || '343');
+      if (distance <= 0 || speed <= 0) {
+        $('#delayResult').textContent = 'Enter valid positive values for distance and speed of sound.';
+        return;
+      }
+      const seconds = distance / speed;
+      const ms = seconds * 1000;
+      $('#delayResult').textContent = `Suggested delay: ${ms.toFixed(1)} ms (${seconds.toFixed(3)} s) for ${distance.toFixed(1)} m from the reference source.`;
+    }
+
+    function renderMacro(note) {
+      $('#macroResult').textContent = note;
+    }
+
+    function logLineCheck(line) {
+      const entry = `${new Date().toLocaleTimeString()} — ${line} checked`;
+      state.lineChecks.unshift(entry);
+      $('#lineCheckLog').textContent = state.lineChecks.join('\n');
+    }
+
+    function generateDMXRows() {
+      const universe = parseInt($('#dmxUniverse').value || '1', 10);
+      const start = parseInt($('#dmxStart').value || '1', 10);
+      const footprint = parseInt($('#dmxFootprint').value || '1', 10);
+      const count = parseInt($('#dmxCount').value || '1', 10);
+      const rows = [];
+      let current = start;
+
+      for (let i = 1; i <= count; i++) {
+        const end = current + footprint - 1;
+        if (end > 512) {
+          rows.push({ fixture: `Fixture ${i}`, universe, start: current, end: 'Overflow' });
+          break;
         }
+        rows.push({ fixture: `Fixture ${i}`, universe, start: current, end });
+        current = end + 1;
+      }
+      return rows;
+    }
 
-        document.body.addEventListener('click', initAudio, { once: false });
+    function renderDMX() {
+      const rows = generateDMXRows();
+      const lines = ['Fixture\tUniverse\tStart\tEnd'];
+      rows.forEach(row => lines.push(`${row.fixture}\t${row.universe}\t${row.start}\t${row.end}`));
+      $('#dmxResults').textContent = lines.join('\n');
+    }
 
-        // Waveform selection
-        let currentWaveType = 'sine';
-        function setWaveType(type) {
-            currentWaveType = type;
-            document.querySelectorAll('.preset-badge').forEach(badge => {
-                if (badge.id === `btn-${type}`) {
-                    badge.classList.add('active');
-                } else if (['btn-sine','btn-square','btn-triangle','btn-sawtooth'].includes(badge.id)) {
-                    badge.classList.remove('active');
-                }
-            });
-            document.getElementById('lbl-wavetype').textContent = type;
-            if (toneOscillator) {
-                toneOscillator.type = type;
-            }
-        }
+    function exportDMX() {
+      const rows = generateDMXRows();
+      const csv = ['Fixture,Universe,Start,End', ...rows.map(r => `${r.fixture},${r.universe},${r.start},${r.end}`)].join('\n');
+      exportBlob('dmx-patch.csv', csv, 'text/csv');
+    }
 
-        // Tone Controls
-        function updateFrequency(val) {
-            document.getElementById('lbl-freq').textContent = val + ' Hz';
-            if (toneOscillator) {
-                toneOscillator.frequency.setValueAtTime(val, audioCtx.currentTime);
-            }
-        }
+    function calculatePoE() {
+      const capacity = parseFloat($('#poeCapacity').value || '0');
+      const rows = $('#poeDevices').value.split('\n').map(line => line.trim()).filter(Boolean);
 
-        function setFrequencyPreset(val) {
-            document.getElementById('range-freq').value = val;
-            updateFrequency(val);
-        }
+      let total = 0;
+      const parsed = rows.map(line => {
+        const [name, watts] = line.split(',').map(part => part.trim());
+        const value = parseFloat(watts || '0');
+        total += value;
+        return { name, value };
+      });
 
-        function updateVolume(val) {
-            document.getElementById('lbl-volume').textContent = val + '%';
-            const gain = val / 100;
-            if (toneGainNode) {
-                toneGainNode.gain.setValueAtTime(gain, audioCtx.currentTime);
-            }
-            if (activeNoiseGain) {
-                activeNoiseGain.gain.setValueAtTime(gain, audioCtx.currentTime);
-            }
-        }
+      const percent = capacity ? (total / capacity) * 100 : 0;
+      const headroom = capacity - total;
+      const detail = parsed.map(device => `${device.name}: ${device.value.toFixed(1)}W`).join(' · ');
 
-        function toggleTone() {
-            initAudio();
-            const btn = document.getElementById('btn-toggle-tone');
-            
-            if (toneOscillator) {
-                // Stop tone
-                toneOscillator.stop();
-                toneOscillator.disconnect();
-                toneOscillator = null;
-                btn.textContent = '▶ Start Tone';
-                btn.classList.remove('btn-danger');
-                btn.classList.add('btn-primary');
-            } else {
-                // Stop any other active signal first
-                stopAllSignals();
-                
-                toneOscillator = audioCtx.createOscillator();
-                toneGainNode = audioCtx.createGain();
-                
-                toneOscillator.type = currentWaveType;
-                toneOscillator.frequency.setValueAtTime(document.getElementById('range-freq').value, audioCtx.currentTime);
-                
-                const volume = document.getElementById('range-volume').value / 100;
-                toneGainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-                
-                toneOscillator.connect(toneGainNode);
-                toneGainNode.connect(audioCtx.destination);
-                
-                toneOscillator.start();
-                btn.textContent = '■ Stop Tone';
-                btn.classList.remove('btn-primary');
-                btn.classList.add('btn-danger');
-            }
-        }
+      $('#poeSummary').textContent =
+        `Total draw ${total.toFixed(1)}W / ${capacity.toFixed(1)}W (${percent.toFixed(0)}% used). Headroom: ${headroom.toFixed(1)}W. ${detail}`;
+    }
 
-        function stopAllSignals() {
-            if (toneOscillator) {
-                toneOscillator.stop();
-                toneOscillator.disconnect();
-                toneOscillator = null;
-                const btn = document.getElementById('btn-toggle-tone');
-                btn.textContent = '▶ Start Tone';
-                btn.classList.remove('btn-danger');
-                btn.classList.add('btn-primary');
-            }
-            
-            if (activeNoiseSource) {
-                activeNoiseSource.stop();
-                activeNoiseSource.disconnect();
-                activeNoiseSource = null;
-                document.getElementById('btn-noise-pink').classList.remove('btn-danger');
-                document.getElementById('btn-noise-white').classList.remove('btn-danger');
-            }
+    function generateWizard() {
+      const symptom = $('#networkSymptom').value;
+      const steps = {
+        drop: [
+          'Confirm IGMP snooping is paired with an active IGMP querier.',
+          'Disable Energy Efficient Ethernet on AV ports.',
+          'Verify the affected streams are intentionally in the correct VLAN.'
+        ],
+        freeze: [
+          'Check uplink bandwidth and link speed between switch tiers.',
+          'Verify jumbo frame settings are aligned end to end where required.',
+          'Inspect port errors, multicast flood behavior, and QoS policy.'
+        ],
+        black: [
+          'Test a non-protected source first to isolate HDCP from signal loss.',
+          'Reduce inline devices and capture links in the display path.',
+          'Re-seat or bypass the suspected switcher or extender leg.'
+        ],
+        signal: [
+          'Force the source to a known-good resolution and refresh rate.',
+          'Set switcher EDID to a stable static profile.',
+          'Power-cycle the destination path for a clean handshake.'
+        ]
+      };
 
-            if (activeChannelNode) {
-                activeChannelNode.stop();
-                activeChannelNode.disconnect();
-                activeChannelNode = null;
-                document.getElementById('btn-channel-left').classList.remove('btn-danger');
-                document.getElementById('btn-channel-right').classList.remove('btn-danger');
-            }
+      $('#wizardList').innerHTML = steps[symptom]
+        .map((step, idx) => `<li class="wizard-step"><strong>Step ${idx + 1}</strong><div>${step}</div></li>`)
+        .join('');
+    }
 
-            if (phaseIntervalId) {
-                clearInterval(phaseIntervalId);
-                phaseIntervalId = null;
-            }
-            if (phaseOscLeft) {
-                phaseOscLeft.stop(); phaseOscLeft.disconnect(); phaseOscLeft = null;
-                phaseOscRight.stop(); phaseOscRight.disconnect(); phaseOscRight = null;
-                document.getElementById('btn-phase-polarity').classList.remove('btn-danger');
-                document.getElementById('btn-phase-polarity').textContent = 'Check Speaker Polarity Phase';
-            }
-        }
+    function generateCribSheet() {
+      const vlan = $('#vlanId').value.trim();
+      const subnet = $('#subnetRange').value.trim();
+      $('#cribSheet').textContent = [
+        `AV VLAN: ${vlan}`,
+        `Subnet: ${subnet}`,
+        'Checklist:',
+        '- IGMP snooping enabled only with querier present',
+        '- EEE disabled on AV ports',
+        '- Jumbo frames aligned where AVoIP vendor requires them',
+        '- 10Gb uplinks or better for high-density video paths',
+        '- PoE headroom documented before adding endpoints'
+      ].join('\n');
+    }
 
-        // Noise Generators
-        function toggleNoise(noiseType) {
-            initAudio();
-            const pinkBtn = document.getElementById('btn-noise-pink');
-            const whiteBtn = document.getElementById('btn-noise-white');
-            
-            if (activeNoiseSource) {
-                stopAllSignals();
-            } else {
-                stopAllSignals();
-                
-                const bufferSize = 2 * audioCtx.sampleRate;
-                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const output = noiseBuffer.getChannelData(0);
-                
-                if (noiseType === 'white') {
-                    for (let i = 0; i < bufferSize; i++) {
-                        output[i] = Math.random() * 2 - 1;
-                    }
-                    whiteBtn.classList.add('btn-danger');
-                } else if (noiseType === 'pink') {
-                    // Voss-McCartney Pink Noise algorithm
-                    let b0, b1, b2, b3, b4, b5, b6;
-                    b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
-                    for (let i = 0; i < bufferSize; i++) {
-                        let white = Math.random() * 2 - 1;
-                        b0 = 0.99886 * b0 + white * 0.0555179;
-                        b1 = 0.99332 * b1 + white * 0.0750759;
-                        b2 = 0.96900 * b2 + white * 0.1538520;
-                        b3 = 0.86650 * b3 + white * 0.3104856;
-                        b4 = 0.55000 * b4 + white * 0.5329522;
-                        b5 = -0.7616 * b5 - white * 0.0168980;
-                        let pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-                        b6 = white * 0.115926;
-                        output[i] = pink * 0.11; // normalization scale factor
-                    }
-                    pinkBtn.classList.add('btn-danger');
-                }
-                
-                activeNoiseSource = audioCtx.createBufferSource();
-                activeNoiseSource.buffer = noiseBuffer;
-                activeNoiseSource.loop = true;
-                
-                activeNoiseGain = audioCtx.createGain();
-                const volume = document.getElementById('range-volume').value / 100;
-                activeNoiseGain.gain.setValueAtTime(volume, audioCtx.currentTime);
-                
-                activeNoiseSource.connect(activeNoiseGain);
-                activeNoiseGain.connect(audioCtx.destination);
-                
-                activeNoiseSource.start();
-            }
-        }
+    function exportRoomReport() {
+      const profile = collectProfileFromForm();
+      const report = {
+        exportedAt: new Date().toISOString(),
+        profile,
+        checklist: state.checklist,
+        incidents: state.incidents,
+        lineChecks: state.lineChecks,
+        poeSummary: $('#poeSummary').textContent,
+        dmxPatch: $('#dmxResults').textContent,
+        networkCribSheet: $('#cribSheet').textContent
+      };
 
-        // Channel routing test
-        function testChannel(channel) {
-            initAudio();
-            const leftBtn = document.getElementById('btn-channel-left');
-            const rightBtn = document.getElementById('btn-channel-right');
-            
-            if (activeChannelNode) {
-                stopAllSignals();
-            } else {
-                stopAllSignals();
-                
-                activeChannelNode = audioCtx.createOscillator();
-                activeChannelNode.type = 'sine';
-                activeChannelNode.frequency.setValueAtTime(440, audioCtx.currentTime); // 440 Hz
-                
-                const gainNode = audioCtx.createGain();
-                const volume = document.getElementById('range-volume').value / 100;
-                gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-                
-                // Channel Merger to route specific channel
-                const panner = audioCtx.createStereoPanner();
-                panner.pan.setValueAtTime(channel === 'left' ? -1 : 1, audioCtx.currentTime);
-                
-                activeChannelNode.connect(gainNode);
-                gainNode.connect(panner);
-                panner.connect(audioCtx.destination);
-                
-                activeChannelNode.start();
-                if (channel === 'left') {
-                    leftBtn.classList.add('btn-danger');
-                } else {
-                    rightBtn.classList.add('btn-danger');
-                }
-            }
-        }
+      const safeName = (profile.name || 'room').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      exportBlob(`${safeName}-report.json`, JSON.stringify(report, null, 2));
+    }
 
-        // Speaker Phase Polarity check
-        let phaseOscLeft = null;
-        let phaseOscRight = null;
-        let phaseIntervalId = null;
-        let isPhaseAlternateIn = true;
-        
-        function togglePhasePolarityCheck() {
-            initAudio();
-            const btn = document.getElementById('btn-phase-polarity');
-            
-            if (phaseOscLeft) {
-                stopAllSignals();
-            } else {
-                stopAllSignals();
-                
-                const volume = document.getElementById('range-volume').value / 100;
-                const merger = audioCtx.createChannelMerger(2);
-                
-                // Create left oscillator
-                phaseOscLeft = audioCtx.createOscillator();
-                phaseOscLeft.frequency.setValueAtTime(440, audioCtx.currentTime);
-                const gainLeft = audioCtx.createGain();
-                gainLeft.gain.setValueAtTime(volume, audioCtx.currentTime);
-                phaseOscLeft.connect(gainLeft);
-                gainLeft.connect(merger, 0, 0); // connect left channel
-                
-                // Create right oscillator
-                phaseOscRight = audioCtx.createOscillator();
-                phaseOscRight.frequency.setValueAtTime(440, audioCtx.currentTime);
-                const gainRight = audioCtx.createGain();
-                gainRight.gain.setValueAtTime(volume, audioCtx.currentTime);
-                phaseOscRight.connect(gainRight);
-                gainRight.connect(merger, 0, 1); // connect right channel
-                
-                merger.connect(audioCtx.destination);
-                
-                phaseOscLeft.start();
-                phaseOscRight.start();
-                
-                btn.classList.add('btn-danger');
-                btn.textContent = '■ Stop Polarity Check [IN PHASE]';
-                isPhaseAlternateIn = true;
-                
-                phaseIntervalId = setInterval(() => {
-                    if (isPhaseAlternateIn) {
-                        // Switch to Out-of-Phase (Invert right channel gain)
-                        gainRight.gain.setValueAtTime(-volume, audioCtx.currentTime);
-                        btn.textContent = '■ Stop Polarity Check [OUT OF PHASE]';
-                        isPhaseAlternateIn = false;
-                    } else {
-                        // Switch to In-Phase
-                        gainRight.gain.setValueAtTime(volume, audioCtx.currentTime);
-                        btn.textContent = '■ Stop Polarity Check [IN PHASE]';
-                        isPhaseAlternateIn = true;
-                    }
-                }, 3000);
-            }
-        }
+    function exportActiveProfile() {
+      saveCurrentProfile();
+      const profile = getActiveProfile();
+      const safeName = (profile.name || 'profile').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      exportBlob(`${safeName}.json`, JSON.stringify(profile, null, 2));
+    }
 
+    function importProfile(file) {
+      if (!file) return;
 
-        // 📺 Fullscreen Calibration Renderer
-        let fullscreenContainer = document.getElementById('fullscreen-canvas-container');
-        let calCanvas = document.getElementById('cal-canvas');
-        let calCtx = calCanvas.getContext('2d');
-        let activePattern = null;
-        let calAnimationId = null;
+      file.text()
+        .then(text => {
+          const parsed = JSON.parse(text);
+          const profile = {
+            id: parsed.id || crypto.randomUUID(),
+            name: parsed.name || 'Imported Profile',
+            client: parsed.client || '',
+            resolution: parsed.resolution || '',
+            codec: parsed.codec || '',
+            notes: parsed.notes || ''
+          };
+          state.profiles.push(profile);
+          state.activeProfileId = profile.id;
+          loadProfileToForm(profile);
+          renderProfiles();
+          updateStats();
+        })
+        .catch(() => alert('Could not import profile JSON.'));
+    }
 
-        function resizeCalCanvas() {
-            calCanvas.width = window.innerWidth;
-            calCanvas.height = window.innerHeight;
-        }
+    function toggleShowMode() {
+      state.showMode = !state.showMode;
+      document.body.classList.toggle('show-mode', state.showMode);
+    }
 
-        window.addEventListener('resize', () => {
-            if (fullscreenContainer.style.display === 'block') {
-                resizeCalCanvas();
-                drawPattern();
-            }
+    function highlightActiveNav() {
+      const sections = ['#dashboard', '#profiles', '#audio', '#video', '#lighting', '#network', '#ops', '#troubleshooting'];
+      const scrollY = window.scrollY + 120;
+      let current = '#dashboard';
+
+      sections.forEach(id => {
+        const el = document.querySelector(id);
+        if (el && el.offsetTop <= scrollY) current = id;
+      });
+
+      $$('.nav-link').forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === current);
+      });
+    }
+
+    const inlineCanvas = $('#patternCanvas');
+    const inlineCtx = inlineCanvas.getContext('2d');
+    const fullscreenCanvas = $('#fullscreenCanvas');
+    const fullscreenCtx = fullscreenCanvas.getContext('2d');
+    const fullscreenContainer = $('#fullscreen-canvas-container');
+
+    let activeCanvas = inlineCanvas;
+    let activeCtx = inlineCtx;
+    let motionX = 0;
+
+    function clearCanvas() {
+      activeCtx.clearRect(0, 0, activeCanvas.width, activeCanvas.height);
+      activeCtx.fillStyle = '#000';
+      activeCtx.fillRect(0, 0, activeCanvas.width, activeCanvas.height);
+    }
+
+    function drawSafeArea() {
+      activeCtx.strokeStyle = 'rgba(255,255,255,0.85)';
+      activeCtx.lineWidth = 2;
+      activeCtx.strokeRect(80, 45, activeCanvas.width - 160, activeCanvas.height - 90);
+
+      activeCtx.strokeStyle = 'rgba(255,255,255,0.35)';
+      activeCtx.strokeRect(160, 90, activeCanvas.width - 320, activeCanvas.height - 180);
+
+      activeCtx.beginPath();
+      activeCtx.moveTo(activeCanvas.width / 2, 0);
+      activeCtx.lineTo(activeCanvas.width / 2, activeCanvas.height);
+      activeCtx.moveTo(0, activeCanvas.height / 2);
+      activeCtx.lineTo(activeCanvas.width, activeCanvas.height / 2);
+      activeCtx.stroke();
+    }
+
+    function drawPattern(pattern = $('#patternSelect').value) {
+      cancelAnimationFrame(state.animationFrame);
+      if (state.rgbInterval) {
+        clearTimeout(state.rgbInterval);
+        state.rgbInterval = null;
+      }
+      clearCanvas();
+
+      if (pattern === 'bars') {
+        const colors = ['#fff', '#ffd500', '#00d1ff', '#00ff72', '#ff41a1', '#ff3b30', '#003cff', '#111'];
+        const w = activeCanvas.width / colors.length;
+        colors.forEach((color, index) => {
+          activeCtx.fillStyle = color;
+          activeCtx.fillRect(index * w, 0, w, activeCanvas.height);
         });
+        drawSafeArea();
+      } else if (pattern === 'grid') {
+        activeCtx.fillStyle = '#111';
+        activeCtx.fillRect(0, 0, activeCanvas.width, activeCanvas.height);
 
-        function launchCalibration(pattern) {
-            activePattern = pattern;
-            resizeCalCanvas();
-            fullscreenContainer.style.display = 'block';
-            
-            // Enter fullscreen
-            if (fullscreenContainer.requestFullscreen) {
-                fullscreenContainer.requestFullscreen();
-            } else if (fullscreenContainer.webkitRequestFullscreen) {
-                fullscreenContainer.webkitRequestFullscreen();
-            }
-            
+        for (let x = 0; x <= activeCanvas.width; x += 64) {
+          activeCtx.strokeStyle = x % 128 === 0 ? 'rgba(79,152,163,0.8)' : 'rgba(255,255,255,0.18)';
+          activeCtx.beginPath();
+          activeCtx.moveTo(x, 0);
+          activeCtx.lineTo(x, activeCanvas.height);
+          activeCtx.stroke();
+        }
+
+        for (let y = 0; y <= activeCanvas.height; y += 64) {
+          activeCtx.strokeStyle = y % 128 === 0 ? 'rgba(79,152,163,0.8)' : 'rgba(255,255,255,0.18)';
+          activeCtx.beginPath();
+          activeCtx.moveTo(0, y);
+          activeCtx.lineTo(activeCanvas.width, y);
+          activeCtx.stroke();
+        }
+
+        drawSafeArea();
+      } else if (pattern === 'framing') {
+        activeCtx.fillStyle = '#101010';
+        activeCtx.fillRect(0, 0, activeCanvas.width, activeCanvas.height);
+
+        activeCtx.strokeStyle = 'rgba(255,255,255,0.7)';
+        activeCtx.lineWidth = 3;
+        activeCtx.strokeRect(40, 40, activeCanvas.width - 80, activeCanvas.height - 80);
+
+        const thirdsX = activeCanvas.width / 3;
+        const thirdsY = activeCanvas.height / 3;
+
+        for (let i = 1; i < 3; i++) {
+          activeCtx.beginPath();
+          activeCtx.moveTo(thirdsX * i, 40);
+          activeCtx.lineTo(thirdsX * i, activeCanvas.height - 40);
+          activeCtx.stroke();
+
+          activeCtx.beginPath();
+          activeCtx.moveTo(40, thirdsY * i);
+          activeCtx.lineTo(activeCanvas.width - 40, thirdsY * i);
+          activeCtx.stroke();
+        }
+
+        activeCtx.beginPath();
+        activeCtx.arc(activeCanvas.width / 2, activeCanvas.height / 2, 42, 0, Math.PI * 2);
+        activeCtx.strokeStyle = 'rgba(79,152,163,1)';
+        activeCtx.stroke();
+      } else if (pattern === 'motion') {
+        animateMotion();
+      } else if (pattern === 'white') {
+        activeCtx.fillStyle = '#ffffff';
+        activeCtx.fillRect(0, 0, activeCanvas.width, activeCanvas.height);
+      } else if (pattern === 'black') {
+        activeCtx.fillStyle = '#000000';
+        activeCtx.fillRect(0, 0, activeCanvas.width, activeCanvas.height);
+      } else if (pattern === 'rgb') {
+        const colors = ['#ff0000', '#00ff00', '#0000ff'];
+        activeCtx.fillStyle = colors[state.rgbCycleIndex || 0];
+        activeCtx.fillRect(0, 0, activeCanvas.width, activeCanvas.height);
+        
+        state.rgbInterval = setTimeout(() => {
+          if ($('#patternSelect').value === 'rgb') {
+            state.rgbCycleIndex = ((state.rgbCycleIndex || 0) + 1) % 3;
+            drawPattern('rgb');
+          }
+        }, 2000);
+      }
+    }
+
+    function animateMotion() {
+      cancelAnimationFrame(state.animationFrame);
+
+      function frame() {
+        clearCanvas();
+        activeCtx.fillStyle = '#0f1111';
+        activeCtx.fillRect(0, 0, activeCanvas.width, activeCanvas.height);
+
+        const colWidth = 110;
+        const numCols = Math.ceil(activeCanvas.width / colWidth) + 2;
+        for (let i = 0; i < numCols; i++) {
+          activeCtx.fillStyle = i % 2 === 0 ? '#4f98a3' : '#f0f0f0';
+          activeCtx.fillRect(i * colWidth - motionX, 0, 60, activeCanvas.height);
+        }
+
+        drawSafeArea();
+        activeCtx.fillStyle = 'rgba(255,255,255,0.92)';
+        activeCtx.font = '700 28px Satoshi';
+        activeCtx.fillText(`Motion test · ${$('#frameRateSelect').value}`, 48, 54);
+
+        motionX = (motionX + 6) % 110;
+        state.animationFrame = requestAnimationFrame(frame);
+      }
+
+      frame();
+    }
+
+    function launchFullscreenPattern() {
+      activeCanvas = fullscreenCanvas;
+      activeCtx = fullscreenCtx;
+
+      fullscreenCanvas.width = window.innerWidth;
+      fullscreenCanvas.height = window.innerHeight;
+
+      fullscreenContainer.style.display = 'block';
+
+      if (fullscreenContainer.requestFullscreen) {
+        fullscreenContainer.requestFullscreen();
+      } else if (fullscreenContainer.webkitRequestFullscreen) {
+        fullscreenContainer.webkitRequestFullscreen();
+      }
+
+      drawPattern();
+      requestWakeLock();
+      document.addEventListener('keydown', handleFullscreenEscKey);
+    }
+
+    function exitFullscreenPattern() {
+      if (document.fullscreenElement === fullscreenContainer || document.webkitFullscreenElement === fullscreenContainer) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+      fullscreenContainer.style.display = 'none';
+
+      cancelAnimationFrame(state.animationFrame);
+      if (state.rgbInterval) {
+        clearTimeout(state.rgbInterval);
+        state.rgbInterval = null;
+      }
+
+      activeCanvas = inlineCanvas;
+      activeCtx = inlineCtx;
+
+      drawPattern();
+      releaseWakeLock();
+      document.removeEventListener('keydown', handleFullscreenEscKey);
+    }
+
+    function handleFullscreenEscKey(e) {
+      if (e.key === 'Escape') {
+        exitFullscreenPattern();
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && activeCanvas === fullscreenCanvas) {
+        exitFullscreenPattern();
+      }
+    });
+
+    document.addEventListener('webkitfullscreenchange', () => {
+      if (!document.webkitFullscreenElement && activeCanvas === fullscreenCanvas) {
+        exitFullscreenPattern();
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (activeCanvas === fullscreenCanvas) {
+        fullscreenCanvas.width = window.innerWidth;
+        fullscreenCanvas.height = window.innerHeight;
+        drawPattern();
+      }
+    });
+
+    function initAudio() {
+      if (!state.audioCtx) {
+        state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (state.audioCtx.state === 'suspended') {
+        state.audioCtx.resume();
+      }
+      return state.audioCtx;
+    }
+
+    function stopAllAudio() {
+      if (state.activeOscillator) {
+        try { state.activeOscillator.stop(); } catch(e){}
+        try { state.activeOscillator.disconnect(); } catch(e){}
+        state.activeOscillator = null;
+      }
+      if (state.activeNoiseSource) {
+        try { state.activeNoiseSource.stop(); } catch(e){}
+        try { state.activeNoiseSource.disconnect(); } catch(e){}
+        state.activeNoiseSource = null;
+      }
+      if (state.activeGainNode) {
+        try { state.activeGainNode.disconnect(); } catch(e){}
+        state.activeGainNode = null;
+      }
+      if (state.activePanner) {
+        try { state.activePanner.disconnect(); } catch(e){}
+        state.activePanner = null;
+      }
+      if (state.sweepInterval) {
+        clearInterval(state.sweepInterval);
+        state.sweepInterval = null;
+      }
+      state.activeSoundId = null;
+
+      $$('.macro-btn, .line-btn').forEach(btn => {
+        btn.classList.remove('btn-danger');
+      });
+
+      const playBtn = $('#playManualBtn');
+      if (playBtn) {
+        playBtn.textContent = '▶ Start Generator';
+        playBtn.classList.remove('btn-danger');
+      }
+    }
+
+    function updateVolume() {
+      const val = parseInt($('#audioVolume').value, 10);
+      $('#volumeVal').textContent = `${val}%`;
+      state.volume = val / 100;
+      if (state.activeGainNode) {
+        state.activeGainNode.gain.setValueAtTime(state.volume, state.audioCtx.currentTime);
+      }
+    }
+
+    function getPinkNoiseBuffer(ctx, durationSeconds = 2) {
+      const bufferSize = ctx.sampleRate * durationSeconds;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        b6 = white * 0.115926;
+        data[i] = pink * 0.11;
+      }
+      return buffer;
+    }
+
+    function playMacro(macroType, btn) {
+      const ctx = initAudio();
+
+      if (state.activeSoundId === `macro-${macroType}`) {
+        stopAllAudio();
+        return;
+      }
+
+      stopAllAudio();
+      btn.classList.add('btn-danger');
+      state.activeSoundId = `macro-${macroType}`;
+
+      if (macroType === 'speech') {
+        const buffer = getPinkNoiseBuffer(ctx);
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+
+        const hp = ctx.createBiquadFilter();
+        hp.type = 'highpass';
+        hp.frequency.value = 125;
+
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 8000;
+
+        const gainNode = ctx.createGain();
+        gainNode.gain.setValueAtTime(state.volume, ctx.currentTime);
+
+        source.connect(hp);
+        hp.connect(lp);
+        lp.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        source.start(0);
+
+        state.activeNoiseSource = source;
+        state.activeGainNode = gainNode;
+        renderMacro("Playing band-limited pink noise from 125 Hz to 8 kHz for speech EQ...");
+      } else if (macroType === 'lowend') {
+        const buffer = getPinkNoiseBuffer(ctx);
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+
+        const hp = ctx.createBiquadFilter();
+        hp.type = 'highpass';
+        hp.frequency.value = 40;
+
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 100;
+
+        const gainNode = ctx.createGain();
+        gainNode.gain.setValueAtTime(state.volume, ctx.currentTime);
+
+        source.connect(hp);
+        hp.connect(lp);
+        lp.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        source.start(0);
+
+        state.activeNoiseSource = source;
+        state.activeGainNode = gainNode;
+        renderMacro("Playing low-end rumble check noise from 40 Hz to 100 Hz...");
+      } else if (macroType === 'feedback') {
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(500, ctx.currentTime);
+
+        const gainNode = ctx.createGain();
+        gainNode.gain.setValueAtTime(state.volume, ctx.currentTime);
+
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        osc.start(0);
+
+        state.activeOscillator = osc;
+        state.activeGainNode = gainNode;
+
+        const sweepDuration = 10;
+
+        function runSweep() {
+          if (!state.activeOscillator || state.activeSoundId !== 'macro-feedback') return;
+          const now = ctx.currentTime;
+          osc.frequency.setValueAtTime(500, now);
+          osc.frequency.exponentialRampToValueAtTime(6000, now + sweepDuration);
+        }
+
+        runSweep();
+
+        state.sweepInterval = setInterval(() => {
+          runSweep();
+        }, sweepDuration * 1000);
+
+        renderMacro("Playing continuous frequency sweep from 500 Hz to 6 kHz (repeating every 10s)...");
+      }
+    }
+
+    function playLineCheck(line, btn) {
+      const ctx = initAudio();
+
+      if (state.activeSoundId === `line-${line}`) {
+        stopAllAudio();
+        return;
+      }
+
+      stopAllAudio();
+      btn.classList.add('btn-danger');
+      state.activeSoundId = `line-${line}`;
+
+      let panValue = 0;
+      let frequency = 1000;
+
+      if (line === 'Left') {
+        panValue = -1;
+      } else if (line === 'Right') {
+        panValue = 1;
+      } else if (line === 'Sub') {
+        panValue = 0;
+        frequency = 60;
+      } else if (line === 'Fill 1') {
+        panValue = -0.6;
+      } else if (line === 'Fill 2') {
+        panValue = 0.6;
+      } else if (line === 'Lobby') {
+        panValue = 0;
+      }
+
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+
+      const gainNode = ctx.createGain();
+      gainNode.gain.setValueAtTime(state.volume, ctx.currentTime);
+
+      let panner;
+      if (ctx.createStereoPanner) {
+        panner = ctx.createStereoPanner();
+        panner.pan.setValueAtTime(panValue, ctx.currentTime);
+      } else {
+        panner = ctx.createPanner();
+        panner.panningModel = 'HRTF';
+        panner.setPosition(panValue, 0, 1 - Math.abs(panValue));
+      }
+
+      osc.connect(gainNode);
+      gainNode.connect(panner);
+      panner.connect(ctx.destination);
+
+      osc.start(0);
+
+      state.activeOscillator = osc;
+      state.activeGainNode = gainNode;
+      state.activePanner = panner;
+
+      const logEntry = `${new Date().toLocaleTimeString()} — ${line} checked`;
+      state.lineChecks.unshift(logEntry);
+      $('#lineCheckLog').textContent = state.lineChecks.join('\n');
+      saveStateToLocalStorage();
+    }
+
+    function saveStateToLocalStorage() {
+      try {
+        const payload = {
+          profiles: state.profiles,
+          activeProfileId: state.activeProfileId,
+          incidents: state.incidents,
+          lineChecks: state.lineChecks,
+          checklistChecked: state.checklist.map(item => ({ id: item.id, checked: item.checked }))
+        };
+        localStorage.setItem('av_toolkit_state', JSON.stringify(payload));
+      } catch (e) {
+        console.error("Failed to save state to localStorage", e);
+      }
+    }
+
+    function loadStateFromLocalStorage() {
+      try {
+        const raw = localStorage.getItem('av_toolkit_state');
+        if (!raw) return;
+        const payload = JSON.parse(raw);
+        if (payload.profiles) state.profiles = payload.profiles;
+        if (payload.activeProfileId) state.activeProfileId = payload.activeProfileId;
+        if (payload.incidents) state.incidents = payload.incidents;
+        if (payload.lineChecks) state.lineChecks = payload.lineChecks;
+        if (payload.checklistChecked) {
+          payload.checklistChecked.forEach(c => {
+            const match = state.checklist.find(item => item.id === c.id);
+            if (match) match.checked = c.checked;
+          });
+        }
+      } catch (e) {
+        console.error("Failed to load state from localStorage", e);
+      }
+    }
+
+    let wakeLock = null;
+
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      } catch (err) {
+        console.warn('Wake Lock request failed:', err);
+      }
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock) {
+        wakeLock.release().then(() => {
+          wakeLock = null;
+        }).catch(() => {});
+      }
+    }
+
+    function playManualGenerator() {
+      const ctx = initAudio();
+
+      if (state.activeSoundId === 'manual-gen') {
+        stopAllAudio();
+        return;
+      }
+
+      stopAllAudio();
+      
+      const btn = $('#playManualBtn');
+      btn.textContent = '■ Stop Generator';
+      btn.classList.add('btn-danger');
+      state.activeSoundId = 'manual-gen';
+
+      const type = $('#manualWaveform').value;
+      const freq = parseFloat($('#manualFreq').value);
+
+      const gainNode = ctx.createGain();
+      gainNode.gain.setValueAtTime(state.volume, ctx.currentTime);
+
+      if (type === 'pink') {
+        const buffer = getPinkNoiseBuffer(ctx);
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+
+        source.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        source.start(0);
+
+        state.activeNoiseSource = source;
+      } else {
+        const osc = ctx.createOscillator();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        osc.start(0);
+
+        state.activeOscillator = osc;
+      }
+
+      state.activeGainNode = gainNode;
+    }
+
+    function updateManualFrequency() {
+      const freq = parseFloat($('#manualFreq').value);
+      $('#manualFreqVal').textContent = `${freq} Hz`;
+      
+      if (state.activeOscillator && state.activeSoundId === 'manual-gen') {
+        state.activeOscillator.frequency.setValueAtTime(freq, state.audioCtx.currentTime);
+      }
+    }
+
+    function updateManualWaveform() {
+      const isPlaying = (state.activeSoundId === 'manual-gen');
+      if (isPlaying) {
+        playManualGenerator();
+        playManualGenerator();
+      }
+    }
+
+    function attachEvents() {
+      $('#themeToggle').addEventListener('click', toggleTheme);
+      $('#calcDelayBtn').addEventListener('click', calculateDelay);
+      $('#dmxCalcBtn').addEventListener('click', renderDMX);
+      $('#dmxExportBtn').addEventListener('click', exportDMX);
+      $('#poeCalcBtn').addEventListener('click', calculatePoE);
+      $('#wizardBtn').addEventListener('click', generateWizard);
+      $('#cribBtn').addEventListener('click', generateCribSheet);
+      $('#addIncidentBtn').addEventListener('click', addIncident);
+      $('#clearIncidentBtn').addEventListener('click', () => {
+        state.incidents = [];
+        renderIncidents();
+        updateStats();
+      });
+      $('#saveProfileBtn').addEventListener('click', saveCurrentProfile);
+      $('#newProfileBtn').addEventListener('click', newBlankProfile);
+      $('#exportChecklistBtn').addEventListener('click', exportRoomReport);
+      $('#exportProfileBtn').addEventListener('click', exportActiveProfile);
+      $('#showModeBtn').addEventListener('click', toggleShowMode);
+      $('#importBtn').addEventListener('click', () => $('#importFile').click());
+      $('#importFile').addEventListener('change', event => importProfile(event.target.files[0]));
+      $('#drawPatternBtn').addEventListener('click', () => drawPattern($('#patternSelect').value));
+      $('#animatePatternBtn').addEventListener('click', () => {
+        $('#patternSelect').value = 'motion';
+        launchFullscreenPattern();
+      });
+      $('#fullscreenPatternBtn').addEventListener('click', launchFullscreenPattern);
+      $('#patternCanvas').addEventListener('dblclick', launchFullscreenPattern);
+      $('#fullscreenCanvas').addEventListener('click', exitFullscreenPattern);
+      $('#clearLineLogBtn').addEventListener('click', () => {
+        state.lineChecks = [];
+        $('#lineCheckLog').textContent = 'No line checks yet.';
+      });
+
+      $('#audioVolume').addEventListener('input', updateVolume);
+      $('#stopAudioBtn').addEventListener('click', stopAllAudio);
+
+      $('#playManualBtn').addEventListener('click', playManualGenerator);
+      $('#manualFreq').addEventListener('input', updateManualFrequency);
+      $('#manualWaveform').addEventListener('change', updateManualWaveform);
+
+      $$('[data-freq-preset]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          $('#manualFreq').value = btn.dataset.freqPreset;
+          updateManualFrequency();
+        });
+      });
+
+      document.addEventListener('visibilitychange', async () => {
+        if (wakeLock !== null && document.visibilityState === 'visible') {
+          await requestWakeLock();
+        }
+      });
+
+      $$('.macro-btn').forEach(btn =>
+        btn.addEventListener('click', () => {
+          playMacro(btn.dataset.sound, btn);
+          saveStateToLocalStorage();
+        })
+      );
+
+      $$('.line-btn').forEach(btn =>
+        btn.addEventListener('click', () => {
+          playLineCheck(btn.dataset.line, btn);
+        })
+      );
+
+      document.body.addEventListener('click', initAudio, { once: false });
+
+      $$('[data-scroll]').forEach(btn =>
+        btn.addEventListener('click', () => scrollToSection(btn.dataset.scroll))
+      );
+
+      document.addEventListener('change', event => {
+        if (event.target.matches('[data-check-id]')) {
+          const id = event.target.getAttribute('data-check-id');
+          const item = state.checklist.find(entry => entry.id === id);
+          if (item) item.checked = event.target.checked;
+          updateStats();
+          saveStateToLocalStorage();
+        }
+      });
+
+      document.addEventListener('click', event => {
+        const loadId = event.target.getAttribute('data-profile-load');
+        const deleteId = event.target.getAttribute('data-profile-delete');
+
+        if (loadId) {
+          const profile = state.profiles.find(p => p.id === loadId);
+          state.activeProfileId = loadId;
+          loadProfileToForm(profile);
+          saveStateToLocalStorage();
+        }
+
+        if (deleteId && state.profiles.length > 1) {
+          state.profiles = state.profiles.filter(p => p.id !== deleteId);
+          if (state.activeProfileId === deleteId) state.activeProfileId = state.profiles[0].id;
+          loadProfileToForm(getActiveProfile());
+          renderProfiles();
+          updateStats();
+          saveStateToLocalStorage();
+        }
+      });
+
+      document.addEventListener('keydown', event => {
+        const activeTag = document.activeElement && document.activeElement.tagName;
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag)) return;
+
+        // Fullscreen pattern cycling shortcuts
+        if (activeCanvas === fullscreenCanvas) {
+          const select = $('#patternSelect');
+          const options = Array.from(select.options).map(opt => opt.value);
+          const currentIndex = options.indexOf(select.value);
+
+          if (event.key === 'ArrowRight' || event.key === ' ') {
+            event.preventDefault();
+            const nextIdx = (currentIndex + 1) % options.length;
+            select.value = options[nextIdx];
             drawPattern();
-            
-            // ESC key handler for exit
-            document.addEventListener('keydown', handleEscKey);
+            return;
+          } else if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            const prevIdx = (currentIndex - 1 + options.length) % options.length;
+            select.value = options[prevIdx];
+            drawPattern();
+            return;
+          } else if (['1', '2', '3', '4', '5', '6', '7'].includes(event.key)) {
+            const idx = parseInt(event.key, 10) - 1;
+            if (idx < options.length) {
+              select.value = options[idx];
+              drawPattern();
+              return;
+            }
+          }
         }
 
-        function handleEscKey(e) {
-            if (e.key === 'Escape') {
-                exitCalibration();
-            }
-        }
-
-        function exitCalibration() {
-            if (document.exitFullscreen) {
-                document.exitFullscreen().catch(() => {});
-            }
-            fullscreenContainer.style.display = 'none';
-            if (calAnimationId) {
-                cancelAnimationFrame(calAnimationId);
-                calAnimationId = null;
-            }
-            document.removeEventListener('keydown', handleEscKey);
-        }
-
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                exitCalibration();
-            }
-        });
-
-        let rgbCycleIndex = 0;
-        function drawPattern() {
-            if (calAnimationId) {
-                cancelAnimationFrame(calAnimationId);
-                calAnimationId = null;
-            }
-
-            const w = calCanvas.width;
-            const h = calCanvas.height;
-
-            if (activePattern === 'white') {
-                calCtx.fillStyle = 'white';
-                calCtx.fillRect(0, 0, w, h);
-            } else if (activePattern === 'black') {
-                calCtx.fillStyle = 'black';
-                calCtx.fillRect(0, 0, w, h);
-            } else if (activePattern === 'rgb') {
-                const colors = ['#ff0000', '#00ff00', '#0000ff'];
-                calCtx.fillStyle = colors[rgbCycleIndex];
-                calCtx.fillRect(0, 0, w, h);
-                
-                // Slow rotation loop
-                setTimeout(() => {
-                    if (activePattern === 'rgb') {
-                        rgbCycleIndex = (rgbCycleIndex + 1) % 3;
-                        drawPattern();
-                    }
-                }, 2000);
-            } else if (activePattern === 'convergence') {
-                calCtx.fillStyle = 'black';
-                calCtx.fillRect(0, 0, w, h);
-                
-                // 1. Grid lines (120px apart)
-                calCtx.strokeStyle = '#475569'; // grey
-                calCtx.lineWidth = 1;
-                for (let x = 120; x < w; x += 120) {
-                    calCtx.beginPath(); calCtx.moveTo(x, 0); calCtx.lineTo(x, h); calCtx.stroke();
-                }
-                for (let y = 120; y < h; y += 120) {
-                    calCtx.beginPath(); calCtx.moveTo(0, y); calCtx.lineTo(w, y); calCtx.stroke();
-                }
-
-                // 2. White outer border (Overscan check)
-                calCtx.strokeStyle = 'white';
-                calCtx.lineWidth = 4;
-                calCtx.strokeRect(2, 2, w-4, h-4);
-
-                // 3. Center crosshair (Red)
-                calCtx.strokeStyle = '#ef4444';
-                calCtx.lineWidth = 2;
-                calCtx.beginPath(); calCtx.moveTo(w/2, 0); calCtx.lineTo(w/2, h); calCtx.stroke();
-                calCtx.beginPath(); calCtx.moveTo(0, h/2); calCtx.lineTo(w, h/2); calCtx.stroke();
-
-                // 4. Center Aspect Ratio Circle (Red, radius 300px on 1080p scale)
-                const centerCircleRadius = 300 * (h / 1080);
-                calCtx.beginPath();
-                calCtx.arc(w/2, h/2, centerCircleRadius, 0, 2 * Math.PI);
-                calCtx.stroke();
-
-                // 5. Corner focus targets (Red, radius 100px)
-                const cornerOffset = 240 * (h / 1080);
-                const focusRadius = 100 * (h / 1080);
-                const corners = [
-                    [cornerOffset, cornerOffset],
-                    [w - cornerOffset, cornerOffset],
-                    [cornerOffset, h - cornerOffset],
-                    [w - cornerOffset, h - cornerOffset]
-                ];
-                
-                corners.forEach(([cx, cy]) => {
-                    calCtx.strokeStyle = '#ef4444';
-                    calCtx.lineWidth = 2;
-                    calCtx.beginPath();
-                    calCtx.arc(cx, cy, focusRadius, 0, 2 * Math.PI);
-                    calCtx.stroke();
-                    
-                    calCtx.beginPath(); calCtx.moveTo(cx - focusRadius - 20, cy); calCtx.lineTo(cx + focusRadius + 20, cy); calCtx.stroke();
-                    calCtx.beginPath(); calCtx.moveTo(cx, cy - focusRadius - 20); calCtx.lineTo(cx, cy + focusRadius + 20); calCtx.stroke();
-                    
-                    // Cross markers
-                    calCtx.fillStyle = 'white';
-                    calCtx.font = '12px monospace';
-                    calCtx.textAlign = 'center';
-                    calCtx.fillText(`(${Math.round(cx)}, ${Math.round(cy)})`, cx, cy + 5);
-                });
-
-                // Center Card
-                calCtx.fillStyle = 'black';
-                calCtx.fillRect(w/2 - 250, h/2 - 80, 500, 160);
-                calCtx.strokeStyle = '#ef4444';
-                calCtx.lineWidth = 2;
-                calCtx.strokeRect(w/2 - 250, h/2 - 80, 500, 160);
-
-                calCtx.fillStyle = 'white';
-                calCtx.font = "bold 24px 'Space Grotesk'";
-                calCtx.fillText("CONVERGENCE & ALIGNMENT TEST", w/2, h/2 - 30);
-                calCtx.font = "16px 'Outfit'";
-                calCtx.fillStyle = '#94a3b8';
-                calCtx.fillText(`${w} x ${h} | Aspect Ratio: ${(w/h).toFixed(2)}:1`, w/2, h/2 + 5);
-                calCtx.fillStyle = '#ef4444';
-                calCtx.fillText("If center circle is not round, scaling is distorted.", w/2, h/2 + 40);
-
-            } else if (activePattern === 'legibility') {
-                calCtx.fillStyle = 'white';
-                calCtx.fillRect(0, 0, w, h);
-
-                // Title header
-                calCtx.fillStyle = '#0f172a';
-                calCtx.fillRect(0, 0, w, 120);
-
-                calCtx.fillStyle = 'white';
-                calCtx.textAlign = 'center';
-                calCtx.font = "bold 28px 'Space Grotesk'";
-                calCtx.fillText("SCREEN SHARE LEGIBILITY & COMPRESSION TEST", w/2, 55);
-                calCtx.font = "16px 'Outfit'";
-                calCtx.fillStyle = '#94a3b8';
-                calCtx.fillText("Evaluate font sizes, contrast levels, and chroma sub-sampling compression (4:2:0 visual artifacts).", w/2, 90);
-
-                // Column 1: Typography sizes
-                const colW = (w - 80) / 3;
-                const colY = 150;
-                const colH = h - 180;
-                
-                calCtx.textAlign = 'left';
-                calCtx.fillStyle = '#334155';
-                calCtx.fillRect(30, colY, colW, 40);
-                calCtx.fillStyle = 'white';
-                calCtx.font = "bold 16px 'Space Grotesk'";
-                calCtx.fillText("TYPOGRAPHY & FONT SIZES", 50, colY + 25);
-
-                calCtx.strokeStyle = '#cbd5e1';
-                calCtx.lineWidth = 1;
-                calCtx.strokeRect(30, colY, colW, colH);
-
-                let textY = colY + 70;
-                const fontSizes = [6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 32];
-                calCtx.fillStyle = 'black';
-                fontSizes.forEach(fs => {
-                    calCtx.font = `${fs}px 'Outfit'`;
-                    calCtx.fillText(`Font ${fs}pt: Pack my box with five dozen liquor jugs.`, 45, textY);
-                    textY += Math.max(fs + 14, 22);
-                });
-
-                // Column 2: Chroma sub-sampling
-                const col2X = 30 + colW + 10;
-                calCtx.fillStyle = '#334155';
-                calCtx.fillRect(col2X, colY, colW, 40);
-                calCtx.fillStyle = 'white';
-                calCtx.font = "bold 16px 'Space Grotesk'";
-                calCtx.fillText("CHROMA SUB-SAMPLING (4:2:0 vs 4:4:4)", col2X + 20, colY + 25);
-                calCtx.strokeRect(col2X, colY, colW, colH);
-
-                // Red on Black Box
-                calCtx.fillStyle = 'black';
-                calCtx.fillRect(col2X + 15, colY + 60, colW - 30, 180);
-                calCtx.textAlign = 'center';
-                calCtx.fillStyle = '#ef4444'; // Red
-                calCtx.font = "bold 18px 'Space Grotesk'";
-                calCtx.fillText("RED ON BLACK TEXT SAMPLES", col2X + colW/2, colY + 100);
-                calCtx.font = "12px 'Outfit'";
-                calCtx.fillText("If this red text is heavily pixelated or smudged,", col2X + colW/2, colY + 135);
-                calCtx.fillText("your software/hardware is applying 4:2:0 chroma sub-sampling.", col2X + colW/2, colY + 160);
-                calCtx.fillStyle = '#10b981'; // Green
-                calCtx.fillText("Green on black does not suffer from sub-sampling filters.", col2X + colW/2, colY + 195);
-
-                // Blue on Black Box
-                calCtx.fillStyle = 'black';
-                calCtx.fillRect(col2X + 15, colY + 260, colW - 30, 100);
-                calCtx.fillStyle = '#3b82f6'; // Blue
-                calCtx.font = "bold 14px 'Space Grotesk'";
-                calCtx.fillText("BLUE ON BLACK COMPRESSION CHECK", col2X + colW/2, colY + 300);
-                calCtx.font = "12px 'Outfit'";
-                calCtx.fillText("Blue highlights are compressed similarly to red signals.", col2X + colW/2, colY + 335);
-
-                // Low Contrast Test
-                calCtx.textAlign = 'left';
-                calCtx.fillStyle = 'black';
-                calCtx.font = "bold 14px 'Space Grotesk'";
-                calCtx.fillText("Low Contrast legibility scale:", col2X + 20, colY + 390);
-                
-                const contrasts = [
-                    ["90% Contrast (Standard)", "#1e293b", 14],
-                    ["70% Contrast (Medium)", "#64748b", 12],
-                    ["50% Contrast (Lower)", "#94a3b8", 10],
-                    ["30% Contrast (Low / Hard)", "#cbd5e1", 8],
-                    ["15% Contrast (Limit)", "#e2e8f0", 6]
-                ];
-                let contrastY = colY + 415;
-                contrasts.forEach(([lbl, color, size]) => {
-                    calCtx.fillStyle = color;
-                    calCtx.font = `${size}px 'Outfit'`;
-                    calCtx.fillText(lbl, col2X + 20, contrastY);
-                    contrastY += 24;
-                });
-
-                // Column 3: Scaling & Line Patterns
-                const col3X = 30 + 2 * colW + 20;
-                calCtx.fillStyle = '#334155';
-                calCtx.fillRect(col3X, colY, colW, 40);
-                calCtx.fillStyle = 'white';
-                calCtx.font = "bold 16px 'Space Grotesk'";
-                calCtx.fillText("FINE LINES & DETAIL TARGETS", col3X + 20, colY + 25);
-                calCtx.strokeRect(col3X, colY, colW, colH);
-
-                let col3Y = colY + 60;
-                calCtx.fillStyle = 'black';
-                calCtx.font = "bold 14px 'Space Grotesk'";
-                calCtx.fillText("1px horizontal lines (1px spacing):", col3X + 20, col3Y + 15);
-                
-                calCtx.strokeStyle = 'black';
-                calCtx.lineWidth = 1;
-                for (let ly = col3Y + 30; ly < col3Y + 60; ly += 2) {
-                    calCtx.beginPath(); calCtx.moveTo(col3X + 20, ly); calCtx.lineTo(col3X + colW - 20, ly); calCtx.stroke();
-                }
-
-                col3Y += 80;
-                calCtx.fillText("2px horizontal lines (2px spacing):", col3X + 20, col3Y + 15);
-                calCtx.lineWidth = 2;
-                for (let ly = col3Y + 30; ly < col3Y + 70; ly += 4) {
-                    calCtx.beginPath(); calCtx.moveTo(col3X + 20, ly); calCtx.lineTo(col3X + colW - 20, ly); calCtx.stroke();
-                }
-
-                col3Y += 90;
-                calCtx.fillText("Concentric Moiré Targets:", col3X + 20, col3Y + 15);
-                calCtx.lineWidth = 1;
-                const cX = col3X + colW / 2;
-                const cY = col3Y + 120;
-                for (let r = 10; r < 90; r += 4) {
-                    calCtx.beginPath();
-                    calCtx.arc(cX, cY, r, 0, 2 * Math.PI);
-                    calCtx.stroke();
-                }
-                
-                calCtx.fillStyle = '#64748b';
-                calCtx.textAlign = 'center';
-                calCtx.font = "12px 'Outfit'";
-                calCtx.fillText("Waves or circular shadows (Moiré) indicate scaling artifacts.", cX, col3Y + 230);
-
-            } else if (activePattern === 'colorbars') {
-                // Draw SMPTE Color Bars
-                const colors = [
-                    '#ffffff', // White
-                    '#f59e0b', // Yellow (ambient)
-                    '#06b6d4', // Cyan
-                    '#10b981', // Green
-                    '#d946ef', // Magenta
-                    '#ef4444', // Red
-                    '#3b82f6'  // Blue
-                ];
-                
-                // Top 75% height color blocks
-                const blockW = w / 7;
-                const barH = h * 0.75;
-                for (let i = 0; i < 7; i++) {
-                    calCtx.fillStyle = colors[i];
-                    calCtx.fillRect(i * blockW, 0, blockW, barH);
-                }
-
-                // Lower 25% alignment block (reversed color sequence & grey scale)
-                const lowerY = barH;
-                const lowerH = h * 0.25;
-                const alignmentColors = [
-                    '#3b82f6', // Blue
-                    '#090d16', // Slate-950
-                    '#d946ef', // Magenta
-                    '#020617', // Black
-                    '#06b6d4', // Cyan
-                    '#f8fafc', // White
-                    '#ffffff'  // Pure White
-                ];
-                for (let i = 0; i < 7; i++) {
-                    calCtx.fillStyle = alignmentColors[i];
-                    calCtx.fillRect(i * blockW, lowerY, blockW, lowerH);
-                }
-            }
-        }
-
-
-        // 🎥 WebRTC Camera & Microphone Diagnostics
-        function loadMediaDevices() {
-            navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-            .then(stream => {
-                // Stream started successfully, close it immediately (we just wanted permissions)
-                stream.getTracks().forEach(track => track.stop());
-                
-                // Enumerate devices
-                navigator.mediaDevices.enumerateDevices()
-                .then(devices => {
-                    const cameraSelect = document.getElementById('select-camera');
-                    const micSelect = document.getElementById('select-mic');
-                    
-                    cameraSelect.innerHTML = '<option value="">Choose camera...</option>';
-                    micSelect.innerHTML = '<option value="">Choose microphone...</option>';
-                    
-                    devices.forEach(device => {
-                        if (device.kind === 'videoinput') {
-                            const opt = document.createElement('option');
-                            opt.value = device.deviceId;
-                            opt.textContent = device.label || `Camera ${cameraSelect.length}`;
-                            cameraSelect.appendChild(opt);
-                        } else if (device.kind === 'audioinput') {
-                            const opt = document.createElement('option');
-                            opt.value = device.deviceId;
-                            opt.textContent = device.label || `Microphone ${micSelect.length}`;
-                            micSelect.appendChild(opt);
-                        }
-                    });
-                });
-            })
-            .catch(err => {
-                console.error("Permissions failed: ", err);
-                alert("Microphone/Camera permission is required for hardware diagnostics.");
-            });
-        }
-
-        function startCameraDiagnostics(deviceId) {
-            const videoEl = document.getElementById('video-preview-el');
-            
-            if (window.cameraStreamTrack) {
-                window.cameraStreamTrack.stop();
-            }
-            
-            if (!deviceId) {
-                videoEl.srcObject = null;
-                return;
-            }
-            
-            const constraints = {
-                video: { deviceId: { exact: deviceId } }
-            };
-            
-            navigator.mediaDevices.getUserMedia(constraints)
-            .then(stream => {
-                window.cameraStreamTrack = stream.getVideoTracks()[0];
-                videoEl.srcObject = stream;
-            })
-            .catch(err => {
-                console.error("Camera start error: ", err);
-            });
-        }
-
-        function startMicrophoneDiagnostics(deviceId) {
-            initAudio();
-            
-            if (microphoneStream) {
-                microphoneStream.getTracks().forEach(track => track.stop());
-            }
-            if (micSource) {
-                micSource.disconnect();
-            }
-            if (vuAnimationId) {
-                cancelAnimationFrame(vuAnimationId);
-            }
-            
-            if (!deviceId) {
-                document.getElementById('lbl-vu-db').textContent = '-inf dB';
-                document.getElementById('vu-bar-fill').style.width = '0%';
-                return;
-            }
-            
-            const constraints = {
-                audio: { deviceId: { exact: deviceId } }
-            };
-            
-            navigator.mediaDevices.getUserMedia(constraints)
-            .then(stream => {
-                microphoneStream = stream;
-                micSource = audioCtx.createMediaStreamSource(stream);
-                micAnalyser = audioCtx.createAnalyser();
-                micAnalyser.fftSize = 256;
-                
-                micSource.connect(micAnalyser);
-                drawVuMeter();
-            })
-            .catch(err => {
-                console.error("Microphone start error: ", err);
-            });
-        }
-
-        function drawVuMeter() {
-            if (!micAnalyser) return;
-            
-            const bufferLength = micAnalyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            micAnalyser.getByteFrequencyData(dataArray);
-            
-            // Calculate average/RMS level
-            let sum = 0;
-            for (let i = 0; i < bufferLength; i++) {
-                sum += dataArray[i];
-            }
-            const average = sum / bufferLength;
-            
-            // Map 0-255 average to db-scale
-            // 0 -> -60dB, 255 -> 0dB
-            const pct = average / 255;
-            const db = pct > 0 ? Math.round(20 * Math.log10(pct)) : -60;
-            
-            const dbLabel = db <= -60 ? '-inf dB' : `${db} dB`;
-            document.getElementById('lbl-vu-db').textContent = dbLabel;
-            
-            // Volume bar width: map db range (-40 to 0) to 0% to 100%
-            let barWidth = 0;
-            if (db > -40) {
-                barWidth = ((db + 40) / 40) * 100;
-            }
-            document.getElementById('vu-bar-fill').style.width = `${Math.min(barWidth, 100)}%`;
-            
-            vuAnimationId = requestAnimationFrame(drawVuMeter);
-        }
-
-        // Initialize lists and permissions on load
-        window.addEventListener('load', () => {
-            loadMediaDevices();
-            loadChecklistStates();
-        });
-
-
-        // 📋 Checklist Functionality
-        let currentChecklist = 'mtr';
-        
-        function switchChecklist(type) {
-            currentChecklist = type;
-            document.getElementById('btn-chk-mtr').classList.remove('active');
-            document.getElementById('btn-chk-event').classList.remove('active');
-            document.getElementById('chk-group-mtr').style.display = 'none';
-            document.getElementById('chk-group-event').style.display = 'none';
-            
-            if (type === 'mtr') {
-                document.getElementById('btn-chk-mtr').classList.add('active');
-                document.getElementById('chk-group-mtr').style.display = 'flex';
-            } else {
-                document.getElementById('btn-chk-event').classList.add('active');
-                document.getElementById('chk-group-event').style.display = 'flex';
-            }
-        }
-
-        function toggleCheckItem(itemEl, checkboxId) {
-            const chk = document.getElementById(checkboxId);
-            chk.checked = !chk.checked;
-            
-            if (chk.checked) {
-                itemEl.classList.add('checked');
-            } else {
-                itemEl.classList.remove('checked');
-            }
-            saveCheckState();
-        }
-
-        function saveCheckState() {
-            const states = {};
-            document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(chk => {
-                states[chk.id] = chk.checked;
-            });
-            localStorage.setItem('av_checklist_states', JSON.stringify(states));
-        }
-
-        function loadChecklistStates() {
-            const statesStr = localStorage.getItem('av_checklist_states');
-            if (statesStr) {
-                try {
-                    const states = JSON.parse(statesStr);
-                    Object.keys(states).forEach(id => {
-                        const chk = document.getElementById(id);
-                        if (chk) {
-                            chk.checked = states[id];
-                            const itemEl = chk.closest('.checklist-item');
-                            if (chk.checked) {
-                                itemEl.classList.add('checked');
-                            } else {
-                                itemEl.classList.remove('checked');
-                            }
-                        }
-                    });
-                } catch(e) {}
-            }
-        }
-
-        function clearChecklistStates() {
-            document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(chk => {
-                chk.checked = false;
-                chk.closest('.checklist-item').classList.remove('checked');
-            });
-            localStorage.removeItem('av_checklist_states');
-        }
-
-        function generateChecklistReport() {
-            const output = [];
-            const d = new Date();
-            output.push("==================================================");
-            output.push("        AV VERIFICATION COMPLIANCE REPORT         ");
-            output.push(` Date/Time : ${d.toLocaleDateString()} ${d.toLocaleTimeString()}`);
-            output.push(" Room Name : Boardroom / Conference Room Delta    ");
-            output.push("==================================================");
-            output.push("");
-
-            output.push("Daily Teams/Zoom Rooms Checks:");
-            const mtrItems = [
-                ["mtr-1", "Tablet controller powered & charging"],
-                ["mtr-2", "Mic mute synchronization to physical DSP mute LEDs"],
-                ["mtr-3", "Speaker playback test clear"],
-                ["mtr-4", "Camera preview & PTZ coordinate verification"],
-                ["mtr-5", "HDMI/USB-C tabletop cable & retractor inspection"]
-            ];
-            mtrItems.forEach(([id, text]) => {
-                const chk = document.getElementById(id);
-                const status = chk && chk.checked ? "[PASS]" : "[FAIL/PENDING]";
-                output.push(`  ${status.padEnd(15)} : ${text}`);
-            });
-            output.push("");
-
-            output.push("Pre-Event Production Checks:");
-            const eventItems = [
-                ["event-1", "Sightlines check & floor safety cables taped"],
-                ["event-2", "Lapel & wireless microphone battery thresholds"],
-                ["event-3", "Acoustic room walk-test (RF & EQ response)"],
-                ["event-4", "Presenter laptop AC connection & Focus Assist mode"],
-                ["event-5", "Confidence monitor output routing view"]
-            ];
-            eventItems.forEach(([id, text]) => {
-                const chk = document.getElementById(id);
-                const status = chk && chk.checked ? "[PASS]" : "[FAIL/PENDING]";
-                output.push(`  ${status.padEnd(15)} : ${text}`);
-            });
-
-            output.push("");
-            output.push("==================================================");
-            output.push(" Report compiled by: AV Technician On Duty        ");
-            output.push("==================================================");
-
-            document.getElementById('report-text-output').value = output.join('\n');
-            document.getElementById('report-modal-el').style.display = 'flex';
-        }
-
-        function closeReportModal() {
-            document.getElementById('report-modal-el').style.display = 'none';
-        }
-
-        function copyReportText() {
-            const txt = document.getElementById('report-text-output');
-            txt.select();
-            document.execCommand('copy');
-            alert("Verification report copied to clipboard!");
-        }
-
-
-        // 🎥 AV Sync / Latency Tester Sweep logic
-        let isSyncRunning = false;
-        let syncCanvas = document.getElementById('sync-tester-canvas');
-        let syncCtx = syncCanvas.getContext('2d');
-        let syncTesterAnimationId = null;
-        let syncDelayMs = 0; // simulated audio delay in ms
-        let syncStartFrameTime = 0;
-
-        function updateSyncDelay(val) {
-            syncDelayMs = parseInt(val);
-            document.getElementById('lbl-sync-delay').textContent = `${val > 0 ? '+' : ''}${val} ms`;
-        }
-
-        function toggleSyncTester() {
-            initAudio();
-            const btn = document.getElementById('btn-toggle-sync');
-            
-            if (isSyncRunning) {
-                isSyncRunning = false;
-                btn.textContent = '▶ Run Sync Sweep';
-                btn.classList.remove('btn-danger');
-                btn.classList.add('btn-primary');
-                if (syncTesterAnimationId) {
-                    cancelAnimationFrame(syncTesterAnimationId);
-                    syncTesterAnimationId = null;
-                }
-            } else {
-                stopAllSignals();
-                isSyncRunning = true;
-                btn.textContent = '■ Stop Sync Sweep';
-                btn.classList.remove('btn-primary');
-                btn.classList.add('btn-danger');
-                syncStartFrameTime = performance.now();
-                drawSyncFrame();
-            }
-        }
-
-        function resetSyncTester() {
-            if (isSyncRunning) {
-                toggleSyncTester();
-            }
-            updateSyncDelay(0);
-            document.getElementById('range-sync-delay').value = 0;
-            // Draw clean empty frame
-            syncCtx.fillStyle = '#090d16';
-            syncCtx.fillRect(0, 0, syncCanvas.width, syncCanvas.height);
-            drawSyncSkeleton(0);
-        }
-
-        function drawSyncSkeleton(markerX = syncCanvas.width / 2) {
-            const w = syncCanvas.width;
-            const h = syncCanvas.height;
-
-            // Draw center Sync target box
-            syncCtx.strokeStyle = '#475569';
-            syncCtx.lineWidth = 1;
-            syncCtx.strokeRect(w/2 - 120, 15, 240, 50);
-            
-            syncCtx.fillStyle = '#64748b';
-            syncCtx.font = "bold 12px 'Space Grotesk'";
-            syncCtx.textAlign = 'center';
-            syncCtx.fillText("SYNC TARGET", w/2, 45);
-
-            // Draw track container
-            const trackY = 140;
-            const trackW = 460;
-            const trackStart = w/2 - trackW/2;
-            const trackEnd = w/2 + trackW/2;
-            
-            syncCtx.fillStyle = '#020617';
-            syncCtx.fillRect(trackStart - 5, trackY - 20, trackW + 10, 40);
-            syncCtx.strokeStyle = '#334155';
-            syncCtx.strokeRect(trackStart - 5, trackY - 20, trackW + 10, 40);
-
-            // Draw tick markers
-            // Scale: 230 pixels = 500 ms (so 0.46 pixels = 1 ms)
-            const pxPerMs = 230 / 500;
-            for (let offset = -500; offset <= 500; offset += 100) {
-                const tx = w/2 + offset * pxPerMs;
-                const isCenter = offset === 0;
-                
-                syncCtx.strokeStyle = isCenter ? '#10b981' : '#64748b';
-                syncCtx.lineWidth = isCenter ? 2 : 1;
-                
-                syncCtx.beginPath();
-                syncCtx.moveTo(tx, trackY - (isCenter ? 15 : 8));
-                syncCtx.lineTo(tx, trackY + (isCenter ? 15 : 8));
-                syncCtx.stroke();
-
-                if (offset % 200 === 0 || isCenter) {
-                    syncCtx.fillStyle = isCenter ? '#34d399' : '#94a3b8';
-                    syncCtx.font = "9px monospace";
-                    syncCtx.fillText(isCenter ? '0 ms' : `${offset > 0 ? '+' : ''}${offset}`, tx, trackY + 25);
-                }
-            }
-
-            // Draw Marker
-            syncCtx.fillStyle = '#ef4444';
-            syncCtx.fillRect(markerX - 4, trackY - 15, 8, 30);
-            syncCtx.strokeStyle = 'white';
-            syncCtx.lineWidth = 1;
-            syncCtx.strokeRect(markerX - 4, trackY - 15, 8, 30);
-        }
-
-        // Spacebar shortcut for sync tester
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && document.getElementById('tab-sync').classList.contains('active')) {
-                e.preventDefault();
-                toggleSyncTester();
-            }
-        });
-
-        // 30 FPS video sync sweep loop
-        let lastBeepTime = 0;
-        function drawSyncFrame() {
-            if (!isSyncRunning) return;
-            
-            const w = syncCanvas.width;
-            const h = syncCanvas.height;
-            const now = performance.now();
-            
-            // Loop duration is exactly 1 second (1000 ms)
-            const elapsed = (now - syncStartFrameTime) % 1000;
-            
-            // Compute sweep marker position
-            // Center is at 500ms
-            const markerOffsetMs = elapsed - 500;
-            const pxPerMs = 230 / 500;
-            const markerX = w/2 + markerOffsetMs * pxPerMs;
-
-            // Flash frame happens at exactly 500ms (when marker hits center)
-            const isFlashFrame = Math.abs(elapsed - 500) < 16.7; // within 1 frame (30fps)
-
-            // Render background
-            syncCtx.fillStyle = isFlashFrame ? '#0d9488' : '#090d16'; // Flash teal or background dark
-            syncCtx.fillRect(0, 0, w, h);
-
-            if (isFlashFrame) {
-                // Draw teal flash box
-                syncCtx.fillStyle = 'white';
-                syncCtx.fillRect(w/2 - 120, 15, 240, 50);
-                syncCtx.fillStyle = 'black';
-                syncCtx.font = "bold 16px 'Space Grotesk'";
-                syncCtx.textAlign = 'center';
-                syncCtx.fillText("FLASH SYNC!", w/2, 45);
-            } else {
-                drawSyncSkeleton(markerX);
-            }
-
-            // Trigger audio beep click with delay offset
-            // We want beep to trigger at exactly 500ms + simulated delay
-            const targetBeepTime = 500 + syncDelayMs;
-            
-            // Trigger if our elapsed time is close to targetBeepTime and we haven't beeped in this cycle
-            const timeDiff = elapsed - targetBeepTime;
-            if (timeDiff >= 0 && timeDiff < 50 && (now - lastBeepTime > 500)) {
-                triggerSyncBeep();
-                lastBeepTime = now;
-            }
-
-            // Frame counter / info
-            syncCtx.fillStyle = '#94a3b8';
-            syncCtx.font = "10px 'Outfit'";
-            syncCtx.textAlign = 'center';
-            syncCtx.fillText(`Tester Frame Sweep | Offset Delay: ${syncDelayMs} ms`, w/2, h - 15);
-
-            syncTesterAnimationId = requestAnimationFrame(drawSyncFrame);
-        }
-
-        function triggerSyncBeep() {
-            if (!audioCtx) return;
-            
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(1000, audioCtx.currentTime); // 1 kHz reference beep
-            
-            // Beep envelope: very quick decay (25ms duration)
-            const now = audioCtx.currentTime;
-            gainNode.gain.setValueAtTime(0.001, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.3, now + 0.002);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
-            
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            osc.start(now);
-            osc.stop(now + 0.04);
-        }
-    </script>
+        const shortcuts = {
+          '1': '#audio',
+          '2': '#video',
+          '3': '#lighting',
+          '4': '#network',
+          '5': '#ops',
+          '6': '#troubleshooting',
+          'g': '#dashboard',
+          'G': '#dashboard'
+        };
+
+        if (event.key === 's' || event.key === 'S') toggleShowMode();
+        if (shortcuts[event.key]) scrollToSection(shortcuts[event.key]);
+      });
+
+      document.addEventListener('scroll', highlightActiveNav, { passive: true });
+    }
+
+    function init() {
+      loadStateFromLocalStorage();
+      const preferredDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(preferredDark ? 'dark' : 'light');
+      loadProfileToForm(getActiveProfile());
+      renderProfiles();
+      renderChecklist();
+      renderIncidents();
+      renderDMX();
+      calculateDelay();
+      calculatePoE();
+      generateWizard();
+      generateCribSheet();
+      updateStats();
+      drawPattern('bars');
+      updateVolume();
+      attachEvents();
+      highlightActiveNav();
+      initIcons();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
 </body>
 </html>

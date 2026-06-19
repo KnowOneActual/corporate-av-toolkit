@@ -57,6 +57,13 @@ Checklists, troubleshooting guides, and diagnostic scripts.
 * 📄 **`edid_hdmi_troubleshooting.md`**: Troubleshooting guide for EDID, HDCP, and display flickering.
 * 📄 **`networked_av_guide.md`**: Configuration guide for Dante and AV-over-IP network switches.
 * 📄 **`mtr_zoom_rooms_daily_check.md`**: Daily checklist for Microsoft Teams Rooms and Zoom Rooms.
+* 📁 **`Zoom_Teams_Meet_Guides/`**: Reference manuals and platform guides for boardrooms and hybrid events:
+  * 📄 [general_hybrid_meeting_room_av_guide.md](file:///Users/userx/github_repo/01_ACTIVE/corporate-av-toolkit/05_Docs_&_Checklists/Zoom_Teams_Meet_Guides/general_hybrid_meeting_room_av_guide.md): Reference manual for hybrid meeting room AV systems.
+  * 📄 [hybrid_meeting_room_guide_for_zoom.md](file:///Users/userx/github_repo/01_ACTIVE/corporate-av-toolkit/05_Docs_&_Checklists/Zoom_Teams_Meet_Guides/hybrid_meeting_room_guide_for_zoom.md): Zoom Rooms hybrid setup and operation.
+  * 📄 [hybrid_meeting_room_guide_for_teams.md](file:///Users/userx/github_repo/01_ACTIVE/corporate-av-toolkit/05_Docs_&_Checklists/Zoom_Teams_Meet_Guides/hybrid_meeting_room_guide_for_teams.md): Microsoft Teams Rooms operational guide.
+  * 📄 [hybrid_meeting_room_guide_for_google_meet.md](file:///Users/userx/github_repo/01_ACTIVE/corporate-av-toolkit/05_Docs_&_Checklists/Zoom_Teams_Meet_Guides/hybrid_meeting_room_guide_for_google_meet.md): Google Meet hardware and room guide.
+  * 📄 [zoom_hybrid_setup_guide.md](file:///Users/userx/github_repo/01_ACTIVE/corporate-av-toolkit/05_Docs_&_Checklists/Zoom_Teams_Meet_Guides/zoom_hybrid_setup_guide.md): Advanced configurations for hybrid Zoom events.
+  * 📄 [zoom_foh_operator_cheat_sheet.md](file:///Users/userx/github_repo/01_ACTIVE/corporate-av-toolkit/05_Docs_&_Checklists/Zoom_Teams_Meet_Guides/zoom_foh_operator_cheat_sheet.md): Quick reference for front-of-house operators.
 * ⚙️ **`av_hardware_diagnostics.py`**: Python script to verify local audio sample rates and hardware devices.
 * ⚙️ **`display_diagnostics.py`**: Python script to query connected displays and read EDID profiles.
 * ⚙️ **`network_av_diagnostics.py`**: Python script to measure network latency, packet loss, and jitter.

@@ -12,6 +12,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(SCRIPT_DIR)  # This will be /home/user/Desktop/test_media_toolkit
 AUDIO_DIR = os.path.join(BASE_DIR, "01_Audio_&_Sync")
 DISPLAY_DIR = os.path.join(BASE_DIR, "02_Display_Calibration")
+LOOPS_DIR = os.path.join(BASE_DIR, "03_Looping_Video_Backgrounds")
 TEMP_FRAMES_DIR = os.path.join(BASE_DIR, "temp_frames")
 
 # Fonts
@@ -547,10 +548,229 @@ def generate_av_sync_video(output_mp4, duration=15):
         
     print(f"AV Sync Video generated successfully at: {output_mp4}")
 
+def generate_judder_test_video(output_mp4, duration=10, fps=60):
+    print("Preparing to build Judder & Refresh Rate Video...")
+    os.makedirs(TEMP_FRAMES_DIR, exist_ok=True)
+    
+    total_frames = duration * fps
+    width, height = 1920, 1080
+    
+    font_title = load_font(FONT_BOLD_PATH, 36)
+    font_subtitle = load_font(FONT_REGULAR_PATH, 20)
+    font_bold_mid = load_font(FONT_BOLD_PATH, 24)
+    font_reg_mid = load_font(FONT_REGULAR_PATH, 18)
+    
+    print(f"Drawing {total_frames} video frames at {fps} FPS...")
+    for i in range(total_frames):
+        t_sec = i / fps
+        
+        # Dark background (slate-950)
+        bg_color = (9, 15, 26)
+        image = Image.new("RGB", (width, height), bg_color)
+        draw = ImageDraw.Draw(image)
+        
+        # 1. Header Information
+        draw.text((width // 2, 60), f"DISPLAY REFRESH RATE & JUDDER TEST ({fps} FPS)", font=font_title, fill="white", anchor="mm")
+        draw.text((width // 2, 110), "The red bar should move with perfect smoothness. Stuttering indicates judder/dropped frames.", font=font_subtitle, fill="#94a3b8", anchor="mm")
+        
+        # 2. Draw static reference grid (makes judder / stutter extremely obvious)
+        grid_y_start = 220
+        grid_y_end = 860
+        for gx in range(160, width - 150, 80):
+            draw.line([(gx, grid_y_start), (gx, grid_y_end)], fill="#1e293b", width=1)
+            
+        # 3. Calculate bar position (bouncing left-to-right using a triangle wave or smooth cosine wave)
+        # Bounce cycle: every 2.0 seconds
+        cycle_period = 2.0
+        # Normalised cycle position [0, 1]
+        cycle_pos = (t_sec % cycle_period) / cycle_period
+        # Smooth cosine interpolation
+        pos_ratio = 0.5 - 0.5 * math.cos(2 * math.pi * cycle_pos)
+        
+        track_width = 1600
+        start_x = (width - track_width) // 2
+        bar_width = 24
+        bar_x = int(start_x + pos_ratio * (track_width - bar_width))
+        
+        # Draw moving red bar with white outline
+        draw.rectangle([bar_x, grid_y_start, bar_x + bar_width, grid_y_end], fill="#ef4444", outline="white", width=2)
+        
+        # 4. Calibration Instructions
+        help_box_y = 900
+        draw.rectangle([width // 2 - 600, help_box_y, width // 2 + 600, help_box_y + 110], fill="#0f172a", outline="#334155")
+        draw.text((width // 2 - 580, help_box_y + 25), "JUDDER & V-SYNC CHECK:", font=font_bold_mid, fill="#38bdf8")
+        
+        instructions = [
+            f"- Video encoded at {fps} FPS. Confirm your display is set to 60Hz or higher.",
+            "- Micro-stutters: If the bar seems to hitch or skip, check for PC hardware decoding bottleneck.",
+            "- Screen Tearing: Horizontal tearing line across the bar indicates disabled V-Sync or buffer mismatch."
+        ]
+        curr_inst_y = help_box_y + 55
+        for inst in instructions:
+            draw.text((width // 2 - 580, curr_inst_y), inst, font=font_reg_mid, fill="white", anchor="lm")
+            curr_inst_y += 22
+            
+        # 5. Status footer
+        status_text = f"Frame: {i:03d} / {total_frames} | Time: {t_sec:.2f}s | Speed: {fps} FPS"
+        draw.text((width // 2, height - 35), status_text, font=font_reg_mid, fill="#64748b", anchor="mm")
+        
+        frame_name = os.path.join(TEMP_FRAMES_DIR, f"frame_{i:04d}.png")
+        image.save(frame_name)
+        
+    print("Ffmpeg encoding video...")
+    # Standard format: H.264 MP4 with NO audio stream (ideal for clean looping background video)
+    cmd = [
+        "ffmpeg", "-y",
+        "-r", str(fps),
+        "-i", os.path.join(TEMP_FRAMES_DIR, "frame_%04d.png"),
+        "-c:v", "libx264",
+        "-pix_fmt", "yuv420p",
+        "-an", # No audio track for loops
+        output_mp4
+    ]
+    
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if result.returncode != 0:
+        print("FFmpeg error output:")
+        print(result.stderr)
+        raise RuntimeError("FFmpeg compilation failed.")
+        
+    # Clean up temp frames directory
+    if os.path.exists(TEMP_FRAMES_DIR):
+        shutil.rmtree(TEMP_FRAMES_DIR)
+        
+    print(f"Judder Test Video generated successfully at: {output_mp4}")
+
+def generate_color_bars_loop(output_mp4, duration=10, fps=30, audio_ref_path=None):
+    print("Preparing to build Moving Color Bars Video...")
+    os.makedirs(TEMP_FRAMES_DIR, exist_ok=True)
+    
+    total_frames = duration * fps
+    width, height = 1920, 1080
+    
+    font_bold = load_font(FONT_BOLD_PATH, 24)
+    font_reg = load_font(FONT_REGULAR_PATH, 16)
+    
+    # 7 standard colors for the top bars
+    bar_colors = [
+        (192, 192, 192), # Light Gray / White
+        (192, 192, 0),   # Yellow
+        (0, 192, 192),   # Cyan
+        (0, 192, 0),     # Green
+        (192, 0, 192),   # Magenta
+        (192, 0, 0),     # Red
+        (0, 0, 192)      # Blue
+    ]
+    bar_width = width // len(bar_colors)
+    
+    print(f"Drawing {total_frames} video frames at {fps} FPS...")
+    for i in range(total_frames):
+        t_sec = i / fps
+        image = Image.new("RGB", (width, height), "black")
+        draw = ImageDraw.Draw(image)
+        
+        # 1. Top 70% color bars
+        bars_height = int(height * 0.7)
+        for idx, color in enumerate(bar_colors):
+            x1 = idx * bar_width
+            x2 = x1 + bar_width if idx < len(bar_colors) - 1 else width
+            draw.rectangle([x1, 0, x2, bars_height], fill=color)
+            
+        # 2. Middle 10% black/white strip
+        mid_height = int(height * 0.8)
+        sq_width = width // 10
+        for s_idx in range(10):
+            s_color = (255, 255, 255) if s_idx % 2 == 0 else (0, 0, 0)
+            draw.rectangle([s_idx * sq_width, bars_height, (s_idx + 1) * sq_width, mid_height], fill=s_color)
+            
+        # 3. Bottom 20% PLUGE calibration pattern & info
+        draw.rectangle([0, mid_height, width, height], fill=(16, 16, 16)) # Standard dark-gray background
+        
+        # Draw PLUGE bars on the bottom left
+        # Standard calibration blocks: -4% (Black 4), 0% (Black 16), +4% (Black 28)
+        pluge_x = 50
+        pluge_y = mid_height + 20
+        pluge_h = height - mid_height - 40
+        
+        # Block 1: -4% Black (Very dark)
+        draw.rectangle([pluge_x, pluge_y, pluge_x + 100, pluge_y + pluge_h], fill=(4, 4, 4))
+        draw.text((pluge_x + 50, pluge_y + pluge_h // 2), "-4% (BLOCKED)", font=font_reg, fill="grey", anchor="mm")
+        
+        # Block 2: 0% Reference Black
+        draw.rectangle([pluge_x + 110, pluge_y, pluge_x + 210, pluge_y + pluge_h], fill=(16, 16, 16))
+        draw.text((pluge_x + 160, pluge_y + pluge_h // 2), "0% (REF BLACK)", font=font_reg, fill="white", anchor="mm")
+        
+        # Block 3: +4% Black (Visible grey)
+        draw.rectangle([pluge_x + 220, pluge_y, pluge_x + 320, pluge_y + pluge_h], fill=(28, 28, 28))
+        draw.text((pluge_x + 270, pluge_y + pluge_h // 2), "+4% (VISIBLE)", font=font_reg, fill="white", anchor="mm")
+        
+        # Draw Calibration Help Text in bottom right
+        info_x = width - 50
+        draw.text((info_x, mid_height + 40), "REFERENCE COLOR BARS & PLUGE PATTERN", font=font_bold, fill="white", anchor="rm")
+        draw.text((info_x, mid_height + 70), "Adjust brightness until '-4%' matches 0% background, and '+4%' is barely visible.", font=font_reg, fill="#94a3b8", anchor="rm")
+        draw.text((info_x, mid_height + 95), f"Duration: {duration}s | {fps} FPS | Reference Tone: 1kHz @ -20dBFS", font=font_reg, fill="#64748b", anchor="rm")
+        
+        # 4. Moving block overlay (Confirms video stream is active, not frozen)
+        # Bounces horizontally in the middle of the color bars
+        block_size = 80
+        bounce_period = 3.0 # bounces every 3 seconds
+        bounce_pos = (t_sec % bounce_period) / bounce_period
+        pos_ratio = 0.5 - 0.5 * math.cos(2 * math.pi * bounce_pos)
+        
+        block_x = int(50 + pos_ratio * (width - 100 - block_size))
+        block_y = bars_height - block_size - 30
+        
+        # Draw bouncing block: white border, black background, red text
+        draw.rectangle([block_x, block_y, block_x + block_size, block_y + block_size], fill="black", outline="white", width=3)
+        draw.text((block_x + block_size // 2, block_y + block_size // 2), f"{i:03d}", font=font_bold, fill="#ef4444", anchor="mm")
+        
+        frame_name = os.path.join(TEMP_FRAMES_DIR, f"frame_{i:04d}.png")
+        image.save(frame_name)
+        
+    print("Ffmpeg encoding video with sync reference audio...")
+    # Assembly: combine frames with the provided reference audio
+    cmd = [
+        "ffmpeg", "-y",
+        "-r", str(fps),
+        "-i", os.path.join(TEMP_FRAMES_DIR, "frame_%04d.png")
+    ]
+    
+    if audio_ref_path and os.path.exists(audio_ref_path):
+        cmd.extend([
+            "-i", audio_ref_path,
+            "-c:v", "libx264",
+            "-pix_fmt", "yuv420p",
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-shortest" # stops when either video or audio finishes
+        ])
+    else:
+        # If no audio ref is found/provided, write without audio
+        cmd.extend([
+            "-c:v", "libx264",
+            "-pix_fmt", "yuv420p",
+            "-an"
+        ])
+        
+    cmd.append(output_mp4)
+    
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if result.returncode != 0:
+        print("FFmpeg error output:")
+        print(result.stderr)
+        raise RuntimeError("FFmpeg compilation failed.")
+        
+    # Clean up temp frames directory
+    if os.path.exists(TEMP_FRAMES_DIR):
+        shutil.rmtree(TEMP_FRAMES_DIR)
+        
+    print(f"Moving Color Bars Video generated successfully at: {output_mp4}")
+
 def main():
     # Make sure output directories exist
     os.makedirs(AUDIO_DIR, exist_ok=True)
     os.makedirs(DISPLAY_DIR, exist_ok=True)
+    os.makedirs(LOOPS_DIR, exist_ok=True)
     
     # 1. Generate audio files
     generate_reference_tone(os.path.join(AUDIO_DIR, "audio_01_ref_1khz_tone.wav"))
@@ -565,6 +785,13 @@ def main():
     
     # 3. Generate AV sync video
     generate_av_sync_video(os.path.join(AUDIO_DIR, "video_01_av_sync_latency_test.mp4"))
+    
+    # 4. Generate new background loops for events & testing
+    generate_judder_test_video(os.path.join(LOOPS_DIR, "video_02_judder_refresh_rate_test.mp4"))
+    generate_color_bars_loop(
+        os.path.join(LOOPS_DIR, "video_03_smpte_color_bars_moving.mp4"),
+        audio_ref_path=os.path.join(AUDIO_DIR, "audio_01_ref_1khz_tone.wav")
+    )
     
     print("\nAV TEST TOOLKIT COMPLETED SUCCESSFULLY!")
 

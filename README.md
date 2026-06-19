@@ -141,4 +141,11 @@ Use this checklist 60-90 minutes before any high-profile corporate presentation 
 
 ---
 
+## 📄 License & Disclaimer
+
+This project is licensed under the MIT License - see the [LICENSE](file:///Users/userx/github_repo/01_ACTIVE/corporate-av-toolkit/LICENSE) file for details.
+For the End User License Agreement (EULA) and operational warnings, please refer to the [DISCLAIMER.md](file:///Users/userx/github_repo/01_ACTIVE/corporate-av-toolkit/DISCLAIMER.md) file.
+
+---
+
 *Toolkit compiled & generated on: 2026-06-13*

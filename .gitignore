@@ -6,3 +6,11 @@
 ehthumbs.db
 Thumbs.db
 __MACOSX/
+
+# Python virtual environments
+.venv/
+venv/
+__pycache__/
+
+# Build / Release archives
+*.zip

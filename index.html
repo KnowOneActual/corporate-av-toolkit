@@ -783,6 +783,13 @@
       .mission-grid { grid-template-columns: 1fr; }
     }
 
+    #toggleDelayAdvanced {
+      transition: color 150ms ease;
+    }
+    #toggleDelayAdvanced:hover {
+      color: var(--color-text) !important;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *,
       *::before,
@@ -821,6 +828,7 @@
           <a class="nav-link active" href="#dashboard"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
           <a class="nav-link" href="#profiles"><i data-lucide="folders"></i><span>Profiles</span></a>
           <a class="nav-link" href="#audio"><i data-lucide="audio-lines"></i><span>Audio</span></a>
+          <a class="nav-link" href="#sync"><i data-lucide="clock"></i><span>AV Sync</span></a>
           <a class="nav-link" href="#video"><i data-lucide="monitor-play"></i><span>Video</span></a>
           <a class="nav-link" href="#lighting"><i data-lucide="lamp-floor"></i><span>Lighting</span></a>
           <a class="nav-link" href="#network"><i data-lucide="network"></i><span>Networking</span></a>
@@ -831,14 +839,15 @@
 
       <div class="sidebar-card">
         <h2>Keyboard shortcuts</h2>
-        <p>Press 1-6 to jump sections, G for dashboard, and S to toggle Show Mode.</p>
+        <p>Press 1-7 to jump sections, G for dashboard, and S to toggle Show Mode.</p>
         <div class="tag-row">
           <span class="tag">1 Audio</span>
-          <span class="tag">2 Video</span>
-          <span class="tag">3 Lighting</span>
-          <span class="tag">4 Network</span>
-          <span class="tag">5 Ops</span>
-          <span class="tag">6 Trouble</span>
+          <span class="tag">2 AV Sync</span>
+          <span class="tag">3 Video</span>
+          <span class="tag">4 Lighting</span>
+          <span class="tag">5 Network</span>
+          <span class="tag">6 Ops</span>
+          <span class="tag">7 Trouble</span>
         </div>
       </div>
     </aside>
@@ -879,6 +888,7 @@
             </div>
             <div class="mission-grid">
               <button class="mission-btn" data-scroll="#audio"><strong>Audio</strong><small>Delay, line checks, speech tuning</small></button>
+              <button class="mission-btn" data-scroll="#sync"><strong>AV Sync</strong><small>Lip-sync, canvas sweep, latency</small></button>
               <button class="mission-btn" data-scroll="#video"><strong>Video</strong><small>Motion tests, safe areas, patterns</small></button>
               <button class="mission-btn" data-scroll="#lighting"><strong>Lighting</strong><small>DMX patching and camera flicker notes</small></button>
               <button class="mission-btn" data-scroll="#network"><strong>Network</strong><small>PoE, IGMP, multicast, uplink triage</small></button>
@@ -950,7 +960,13 @@
           </div>
           <div class="cards-4">
             <div class="subpanel">
-              <h4>Distance to delay</h4>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+                <h4 style="margin: 0;">Distance to delay</h4>
+                <button type="button" id="toggleDelayAdvanced" style="background: none; border: none; padding: 0; color: var(--color-text-faint); cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">
+                  <i data-lucide="settings-2" style="width: 12px; height: 12px;"></i>
+                  <span>Advanced</span>
+                </button>
+              </div>
               <div class="field-grid">
                 <div class="field">
                   <label for="delayDistance">Distance</label>
@@ -962,6 +978,12 @@
                     <option value="meters" selected>Meters (m)</option>
                     <option value="feet">Feet (ft)</option>
                   </select>
+                </div>
+              </div>
+              <div id="delayAdvancedContent" style="display: none; margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px dashed color-mix(in oklab, var(--color-text) 10%, transparent);">
+                <div class="field">
+                  <label for="delayTemp" id="delayTempLabel">Air Temperature (°C)</label>
+                  <input id="delayTemp" type="number" value="20" step="0.5" />
                 </div>
               </div>
               <div class="toolbar"><button class="btn btn-primary" id="calcDelayBtn">Calculate</button></div>
@@ -1015,6 +1037,45 @@
               <div class="toolbar">
                 <button class="btn btn-primary" id="playManualBtn">▶ Start Generator</button>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="sync" class="panel">
+          <div class="section-head">
+            <div>
+              <h3>AV Lip-Sync Latency Tester</h3>
+              <p>Simulate and measure latency offsets between speakers and displays. Align the audio click with the center flash.</p>
+            </div>
+          </div>
+          <div class="video-patterns">
+            <div class="canvas-wrap">
+              <canvas id="syncCanvas" width="1280" height="720" aria-label="AV Lip-Sync Canvas"></canvas>
+            </div>
+            <div class="subpanel">
+              <h4>Sync Controls</h4>
+              <div class="field" style="margin-bottom: var(--space-3);">
+                <label for="syncDelayRange">Simulate Audio Offset: <span id="syncDelayVal">0 ms</span></label>
+                <input
+                  type="range"
+                  style="width: 100%; height: 6px; padding: 0; cursor: pointer; -webkit-appearance: none; background: var(--color-border); border-radius: 999px;"
+                  id="syncDelayRange"
+                  min="-300"
+                  max="300"
+                  step="5"
+                  value="0"
+                  aria-label="Sync Delay Selector"
+                />
+              </div>
+              <div class="toolbar">
+                <button class="btn btn-primary" id="btnToggleSync">▶ Run Sync Sweep</button>
+                <button class="btn" id="btnResetSync">Reset</button>
+              </div>
+              <p class="result-box" style="margin-top: var(--space-4);">
+                <strong>Negative (-)</strong>: Audio triggers <em>before</em> the sync flash.<br />
+                <strong>Positive (+)</strong>: Audio triggers <em>after</em> the sync flash (typical DSP lag).<br />
+                Press <strong>spacebar</strong> to play/pause when in AV Sync section.
+              </p>
             </div>
           </div>
         </section>
@@ -1406,7 +1467,12 @@ Touch Panel, 7</textarea>
       sweepInterval: null,
       activeSoundId: null,
       volume: 0.5,
-      slideLogoImg: null
+      slideLogoImg: null,
+      isSyncRunning: false,
+      syncDelayMs: 0,
+      syncStartFrameTime: 0,
+      syncTesterAnimationId: null,
+      lastBeepTime: 0
     };
 
     state.activeProfileId = state.profiles[0].id;
@@ -1590,12 +1656,58 @@ Touch Panel, 7</textarea>
         return;
       }
       const unit = $('#delayUnit').value;
-      const speed = unit === 'feet' ? 1125 : 343; // Standard speed of sound at 20°C / 68°F
-      const speedText = unit === 'feet' ? '1125 ft/s' : '343 m/s';
-      const unitText = unit === 'feet' ? 'ft' : 'm';
+      const isFeet = unit === 'feet';
+      const unitText = isFeet ? 'ft' : 'm';
+      
+      const tempVal = parseFloat($('#delayTemp').value);
+      let speed;
+      let speedText;
+      let conditionsText;
+
+      if (isNaN(tempVal)) {
+        speed = isFeet ? 1125 : 343;
+        speedText = isFeet ? '1125 ft/s' : '343 m/s';
+        conditionsText = 'at standard 20°C/68°F';
+      } else {
+        if (isFeet) {
+          // Precise speed of sound formula in dry air: c = 49.02 * sqrt(459.67 + T_F)
+          speed = 49.02 * Math.sqrt(459.67 + tempVal);
+          speedText = `${speed.toFixed(1)} ft/s`;
+          conditionsText = `at ${tempVal.toFixed(1)}°F`;
+        } else {
+          // Precise speed of sound formula in dry air: c = 331.3 * sqrt(1 + T_C / 273.15)
+          speed = 331.3 * Math.sqrt(1 + tempVal / 273.15);
+          speedText = `${speed.toFixed(1)} m/s`;
+          conditionsText = `at ${tempVal.toFixed(1)}°C`;
+        }
+      }
+
       const seconds = distance / speed;
       const ms = seconds * 1000;
-      $('#delayResult').textContent = `Suggested delay: ${ms.toFixed(1)} ms (${seconds.toFixed(3)} s) for ${distance.toFixed(1)} ${unitText} (using standard ${speedText} at 20°C/68°F).`;
+      $('#delayResult').textContent = `Suggested delay: ${ms.toFixed(1)} ms (${seconds.toFixed(3)} s) for ${distance.toFixed(1)} ${unitText} (using ${speedText} ${conditionsText}).`;
+    }
+
+    function updateDelayTempUnit() {
+      const unit = $('#delayUnit').value;
+      const tempInput = $('#delayTemp');
+      const label = $('#delayTempLabel');
+      const currentVal = parseFloat(tempInput.value);
+      
+      if (unit === 'feet') {
+        label.textContent = 'Air Temperature (°F)';
+        if (currentVal >= -10 && currentVal <= 50) {
+          tempInput.value = Math.round(currentVal * 1.8 + 32);
+        } else if (isNaN(currentVal)) {
+          tempInput.value = 68;
+        }
+      } else {
+        label.textContent = 'Air Temperature (°C)';
+        if (currentVal > 50 && currentVal <= 122) {
+          tempInput.value = Math.round((currentVal - 32) / 1.8 * 10) / 10;
+        } else if (isNaN(currentVal)) {
+          tempInput.value = 20;
+        }
+      }
     }
 
     function renderMacro(note) {
@@ -1759,7 +1871,7 @@ Touch Panel, 7</textarea>
     }
 
     function highlightActiveNav() {
-      const sections = ['#dashboard', '#profiles', '#audio', '#video', '#lighting', '#network', '#ops', '#troubleshooting'];
+      const sections = ['#dashboard', '#profiles', '#audio', '#sync', '#video', '#lighting', '#network', '#ops', '#troubleshooting'];
       const scrollY = window.scrollY + 120;
       let current = '#dashboard';
 
@@ -1778,6 +1890,8 @@ Touch Panel, 7</textarea>
     const fullscreenCanvas = $('#fullscreenCanvas');
     const fullscreenCtx = fullscreenCanvas.getContext('2d');
     const fullscreenContainer = $('#fullscreen-canvas-container');
+    const syncCanvas = $('#syncCanvas');
+    const syncCtx = syncCanvas ? syncCanvas.getContext('2d') : null;
 
     let activeCanvas = inlineCanvas;
     let activeCtx = inlineCtx;
@@ -2082,6 +2196,191 @@ Touch Panel, 7</textarea>
       link.click();
     }
 
+    function drawSyncSkeleton(markerX) {
+      if (!syncCtx || !syncCanvas) return;
+
+      const w = syncCanvas.width;
+      const h = syncCanvas.height;
+
+      // Draw center sync target box
+      syncCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+      syncCtx.lineWidth = 2;
+      const boxW = w * 0.4;
+      const boxH = h * 0.2;
+      syncCtx.strokeRect(w / 2 - boxW / 2, h * 0.1, boxW, boxH);
+
+      syncCtx.fillStyle = '#afa9a1';
+      syncCtx.font = `bold ${Math.max(14, w / 40)}px var(--font-display)`;
+      syncCtx.textAlign = 'center';
+      syncCtx.textBaseline = 'middle';
+      syncCtx.fillText('SYNC TARGET', w / 2, h * 0.2);
+
+      // Draw track container
+      const trackY = h * 0.6;
+      const trackW = w * 0.8;
+      const trackStart = w / 2 - trackW / 2;
+      const trackH = h * 0.15;
+
+      syncCtx.fillStyle = '#0a0e17';
+      syncCtx.fillRect(trackStart, trackY - trackH / 2, trackW, trackH);
+      syncCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+      syncCtx.lineWidth = 2;
+      syncCtx.strokeRect(trackStart, trackY - trackH / 2, trackW, trackH);
+
+      // Draw tick markers
+      const pxPerMs = trackW / 1000;
+      for (let offset = -500; offset <= 500; offset += 100) {
+        const tx = w / 2 + offset * pxPerMs;
+        const isCenter = offset === 0;
+
+        syncCtx.strokeStyle = isCenter ? '#7cbe52' : 'rgba(255,255,255,0.2)';
+        syncCtx.lineWidth = isCenter ? 3 : 1.5;
+
+        syncCtx.beginPath();
+        syncCtx.moveTo(tx, trackY - (isCenter ? trackH * 0.45 : trackH * 0.25));
+        syncCtx.lineTo(tx, trackY + (isCenter ? trackH * 0.45 : trackH * 0.25));
+        syncCtx.stroke();
+
+        if (offset % 200 === 0 || isCenter) {
+          syncCtx.fillStyle = isCenter ? '#7cbe52' : '#afa9a1';
+          syncCtx.font = `${Math.max(10, w / 80)}px monospace`;
+          syncCtx.fillText(isCenter ? '0 ms' : `${offset > 0 ? '+' : ''}${offset}`, tx, trackY + trackH * 0.7);
+        }
+      }
+
+      // Draw Marker
+      if (typeof markerX === 'number') {
+        syncCtx.fillStyle = '#de76ba';
+        const markerW = Math.max(8, w / 150);
+        syncCtx.fillRect(markerX - markerW / 2, trackY - trackH * 0.4, markerW, trackH * 0.8);
+        syncCtx.strokeStyle = '#fff';
+        syncCtx.lineWidth = 1.5;
+        syncCtx.strokeRect(markerX - markerW / 2, trackY - trackH * 0.4, markerW, trackH * 0.8);
+      }
+    }
+
+    function drawSyncFrame() {
+      if (!state.isSyncRunning || !syncCtx || !syncCanvas) return;
+
+      const w = syncCanvas.width;
+      const h = syncCanvas.height;
+      const now = performance.now();
+
+      const elapsed = (now - state.syncStartFrameTime) % 1000;
+
+      const markerOffsetMs = elapsed - 500;
+      const pxPerMs = (w * 0.8) / 1000;
+      const markerX = w / 2 + markerOffsetMs * pxPerMs;
+
+      const isFlashFrame = Math.abs(elapsed - 500) < 16.7;
+
+      syncCtx.fillStyle = isFlashFrame ? '#243236' : '#0a0e17';
+      syncCtx.fillRect(0, 0, w, h);
+
+      if (isFlashFrame) {
+        syncCtx.fillStyle = '#fff';
+        const boxW = w * 0.4;
+        const boxH = h * 0.2;
+        syncCtx.fillRect(w / 2 - boxW / 2, h * 0.1, boxW, boxH);
+
+        syncCtx.fillStyle = '#0a0e17';
+        syncCtx.font = `bold ${Math.max(16, w / 35)}px var(--font-display)`;
+        syncCtx.textAlign = 'center';
+        syncCtx.textBaseline = 'middle';
+        syncCtx.fillText('FLASH SYNC!', w / 2, h * 0.2);
+      } else {
+        drawSyncSkeleton(markerX);
+      }
+
+      const targetBeepTime = 500 + state.syncDelayMs;
+      const timeDiff = elapsed - targetBeepTime;
+      if (timeDiff >= 0 && timeDiff < 50 && now - state.lastBeepTime > 500) {
+        triggerSyncBeep();
+        state.lastBeepTime = now;
+      }
+
+      syncCtx.fillStyle = '#afa9a1';
+      syncCtx.font = `${Math.max(10, w / 90)}px var(--font-body)`;
+      syncCtx.textAlign = 'center';
+      syncCtx.fillText(`Tester Frame Sweep | Offset Delay: ${state.syncDelayMs} ms`, w / 2, h - 20);
+
+      state.syncTesterAnimationId = requestAnimationFrame(drawSyncFrame);
+    }
+
+    function triggerSyncBeep() {
+      const ctx = initAudio();
+      if (!ctx) return;
+
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1000, ctx.currentTime);
+
+      const now = ctx.currentTime;
+      gainNode.gain.setValueAtTime(0.001, now);
+      gainNode.gain.exponentialRampToValueAtTime(state.volume * 0.6, now + 0.002);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.04);
+    }
+
+    function toggleSyncTester() {
+      initAudio();
+
+      if (state.isSyncRunning) {
+        state.isSyncRunning = false;
+        const btn = $('#btnToggleSync');
+        if (btn) {
+          btn.textContent = '▶ Run Sync Sweep';
+          btn.classList.remove('btn-danger');
+        }
+        if (state.syncTesterAnimationId) {
+          cancelAnimationFrame(state.syncTesterAnimationId);
+          state.syncTesterAnimationId = null;
+        }
+      } else {
+        stopAllAudio();
+        state.isSyncRunning = true;
+        const btn = $('#btnToggleSync');
+        if (btn) {
+          btn.textContent = '■ Stop Sync Sweep';
+          btn.classList.add('btn-danger');
+        }
+        state.syncStartFrameTime = performance.now();
+        drawSyncFrame();
+      }
+    }
+
+    function updateSyncDelay(val) {
+      state.syncDelayMs = parseInt(val, 10);
+      const lbl = $('#syncDelayVal');
+      if (lbl) {
+        lbl.textContent = `${state.syncDelayMs > 0 ? '+' : ''}${state.syncDelayMs} ms`;
+      }
+    }
+
+    function resetSyncTester() {
+      if (state.isSyncRunning) {
+        toggleSyncTester();
+      }
+      updateSyncDelay(0);
+      const slider = $('#syncDelayRange');
+      if (slider) {
+        slider.value = 0;
+      }
+
+      if (syncCtx && syncCanvas) {
+        syncCtx.fillStyle = '#0a0e17';
+        syncCtx.fillRect(0, 0, syncCanvas.width, syncCanvas.height);
+        drawSyncSkeleton(syncCanvas.width / 2);
+      }
+    }
+
     function animateMotion() {
       cancelAnimationFrame(state.animationFrame);
 
@@ -2222,6 +2521,10 @@ Touch Panel, 7</textarea>
       if (playBtn) {
         playBtn.textContent = '▶ Start Generator';
         playBtn.classList.remove('btn-danger');
+      }
+
+      if (state.isSyncRunning) {
+        toggleSyncTester();
       }
     }
 
@@ -2599,8 +2902,27 @@ Touch Panel, 7</textarea>
         });
       });
 
+      // Sync Tester Listeners
+      if ($('#btnToggleSync')) {
+        $('#btnToggleSync').addEventListener('click', toggleSyncTester);
+      }
+      if ($('#btnResetSync')) {
+        $('#btnResetSync').addEventListener('click', resetSyncTester);
+      }
+      if ($('#syncDelayRange')) {
+        $('#syncDelayRange').addEventListener('input', (e) => {
+          updateSyncDelay(e.target.value);
+        });
+      }
+
       $('#themeToggle').addEventListener('click', toggleTheme);
       $('#calcDelayBtn').addEventListener('click', calculateDelay);
+      $('#delayUnit').addEventListener('change', updateDelayTempUnit);
+      $('#toggleDelayAdvanced').addEventListener('click', () => {
+        const advanced = $('#delayAdvancedContent');
+        const isHidden = advanced.style.display === 'none';
+        advanced.style.display = isHidden ? 'block' : 'none';
+      });
       $('#dmxCalcBtn').addEventListener('click', renderDMX);
       $('#dmxExportBtn').addEventListener('click', exportDMX);
       $('#poeCalcBtn').addEventListener('click', calculatePoE);
@@ -2736,14 +3058,24 @@ Touch Panel, 7</textarea>
 
         const shortcuts = {
           '1': '#audio',
-          '2': '#video',
-          '3': '#lighting',
-          '4': '#network',
-          '5': '#ops',
-          '6': '#troubleshooting',
+          '2': '#sync',
+          '3': '#video',
+          '4': '#lighting',
+          '5': '#network',
+          '6': '#ops',
+          '7': '#troubleshooting',
           'g': '#dashboard',
           'G': '#dashboard'
         };
+
+        if (event.key === ' ' || event.code === 'Space') {
+          const activeLink = $('.nav-link.active');
+          if (activeLink && activeLink.getAttribute('href') === '#sync') {
+            event.preventDefault();
+            toggleSyncTester();
+            return;
+          }
+        }
 
         if (event.key === 's' || event.key === 'S') toggleShowMode();
         if (shortcuts[event.key]) scrollToSection(shortcuts[event.key]);
@@ -2767,6 +3099,7 @@ Touch Panel, 7</textarea>
       generateCribSheet();
       updateStats();
       drawPattern('bars');
+      resetSyncTester();
       updateVolume();
       attachEvents();
       highlightActiveNav();

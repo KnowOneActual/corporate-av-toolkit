@@ -61,7 +61,3 @@ Use **`video_02_judder_refresh_rate_test.mp4`** to test rendering performance an
 Usage of the pre-packaged video footage is subject to the End User License Agreement. Please review the [footage_eula.pdf](file:///Users/userx/github_repo/01_ACTIVE/corporate-av-toolkit/03_Looping_Video_Backgrounds/footage_eula.pdf) file in this directory for detailed constraints on corporate distribution and reuse.
 
 ---
-
-## 🛠️ Code Tools
-
-These files are programmatically compiled using [generate_toolkit.py](05_Docs_&_Checklists/generate_toolkit.py) and optimized using [optimize_toolkit.py](/05_Docs_&_Checklists/optimize_toolkit.py).

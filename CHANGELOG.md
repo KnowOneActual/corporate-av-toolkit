@@ -2,6 +2,26 @@
 
 All notable changes to the Corporate AV Toolkit project are documented in this file.
 
+## [2.2.0] - 2026-06-19
+
+### Added
+- **AV Lip-Sync Latency Tester**:
+  - Re-integrated the visual/audible latency offset sweep simulator into the calibration tools.
+  - Features interactive audio offset settings ranging from -300ms to +300ms.
+  - Configured HTML5 canvas sweeping animations with visual flash sweeps and markers.
+  - Integrated a 1kHz audio click generator synced to the sweep.
+  - Bound spacebar play/pause toggling when navigating the AV Sync section.
+  - Updated keyboard navigation shortcut options (1-7 layout, adding 2 for AV Sync).
+  - Wired state integration for local persistence and global stop checks.
+
+## [2.1.3] - 2026-06-19
+
+### Added
+- **Advanced Speaker Delay Calculator Settings**:
+  - Introduced an expandable **Advanced** settings panel to the Distance to Delay calculator to keep the interface simple by default.
+  - Added an **Air Temperature** input field that dynamically links to the distance unit selector: Celsius (°C) for Meters (m) and Fahrenheit (°F) for Feet (ft), including automatic value conversion when units are changed.
+  - Upgraded the speed of sound delay logic to calculate dynamically using temperature-based dry air sound speed formulas ($c = 331.3 \sqrt{1 + T_C / 273.15}$ for Celsius and $c = 49.02 \sqrt{459.67 + T_F}$ for Fahrenheit).
+
 ## [2.1.2] - 2026-06-19
 
 ### Added

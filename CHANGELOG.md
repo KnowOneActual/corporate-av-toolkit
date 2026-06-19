@@ -2,6 +2,21 @@
 
 All notable changes to the Corporate AV Toolkit project are documented in this file.
 
+## [2.1.0] - 2026-06-19
+
+### Added
+- **Staging & Diagnostics Loops (60 FPS & 30 FPS)**:
+  - `video_02_judder_refresh_rate_test.mp4`: A 60 FPS vertical movement bar test pattern designed to detect micro-stutter, frame drops, and V-Sync tearing on displays and LED walls.
+  - `video_03_smpte_color_bars_moving.mp4`: A 30 FPS reference color bar pattern with a moving horizontal block (to identify signal freeze) and a 1 kHz sine reference tone at -20 dBFS.
+- **Standby & Still Slide Generator (Logo/SNAFU)**:
+  - Integrated an interactive canvas still slide generator into the offline Web Dashboard (`index.html`).
+  - Added slide templates for *Generic Logo*, *Technical Difficulties*, *Session Starting*, *Intermission*, and *Q&A*.
+  - Supports client logo uploads, custom titles/subtitles, solid/gradient backgrounds, and custom brand theme color pickers.
+  - Generates and exports high-quality 1080p and 4K still PNG images for switcher Still Stores.
+- **Pre-Generated Backup Stills**:
+  - Rendered five standard 1080p STILL PNG images (`still_01_logo_placeholder.png` through `still_05_qa_session.png`) in `03_Looping_Video_Backgrounds/` for immediate on-site deployment.
+  - Created `generate_backup_stills.py` to allow automated recompilation of the stills with custom adjustments.
+
 ## [2.0.0] - 2026-06-17
 
 ### Added

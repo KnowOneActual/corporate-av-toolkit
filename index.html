@@ -952,8 +952,17 @@
             <div class="subpanel">
               <h4>Distance to delay</h4>
               <div class="field-grid">
-                <div class="field"><label for="distanceMeters">Distance (meters)</label><input id="distanceMeters" type="number" value="12" min="0" step="0.1" /></div>
-                <div class="field"><label for="speedOfSound">Speed of sound</label><input id="speedOfSound" type="number" value="343" min="1" /></div>
+                <div class="field">
+                  <label for="delayDistance">Distance</label>
+                  <input id="delayDistance" type="number" value="12" min="0" step="0.1" />
+                </div>
+                <div class="field">
+                  <label for="delayUnit">Unit</label>
+                  <select id="delayUnit">
+                    <option value="meters" selected>Meters (m)</option>
+                    <option value="feet">Feet (ft)</option>
+                  </select>
+                </div>
               </div>
               <div class="toolbar"><button class="btn btn-primary" id="calcDelayBtn">Calculate</button></div>
               <p class="result-box" id="delayResult">Delay result will appear here.</p>
@@ -1071,9 +1080,18 @@
                   </select>
                 </div>
                 <div class="field">
-                  <label for="slideLogoInput">Upload Client Logo</label>
-                  <input type="file" id="slideLogoInput" accept="image/*" />
+                  <label for="slideLogoMode">Logo Option</label>
+                  <select id="slideLogoMode">
+                    <option value="placeholder">Placeholder Logo</option>
+                    <option value="upload">Upload Custom Logo...</option>
+                    <option value="none">No Logo (Clean Slide)</option>
+                  </select>
                 </div>
+              </div>
+
+              <div class="field" id="slideLogoUploadField" style="margin-bottom: var(--space-3); display: none;">
+                <label for="slideLogoInput">Upload Client Logo</label>
+                <input type="file" id="slideLogoInput" accept="image/*" />
               </div>
               
               <div class="field-grid" style="margin-bottom: var(--space-3);">
@@ -1566,15 +1584,18 @@ Touch Panel, 7</textarea>
     }
 
     function calculateDelay() {
-      const distance = parseFloat($('#distanceMeters').value || '0');
-      const speed = parseFloat($('#speedOfSound').value || '343');
-      if (distance <= 0 || speed <= 0) {
-        $('#delayResult').textContent = 'Enter valid positive values for distance and speed of sound.';
+      const distance = parseFloat($('#delayDistance').value || '0');
+      if (distance <= 0) {
+        $('#delayResult').textContent = 'Enter a valid positive distance.';
         return;
       }
+      const unit = $('#delayUnit').value;
+      const speed = unit === 'feet' ? 1125 : 343; // Standard speed of sound at 20°C / 68°F
+      const speedText = unit === 'feet' ? '1125 ft/s' : '343 m/s';
+      const unitText = unit === 'feet' ? 'ft' : 'm';
       const seconds = distance / speed;
       const ms = seconds * 1000;
-      $('#delayResult').textContent = `Suggested delay: ${ms.toFixed(1)} ms (${seconds.toFixed(3)} s) for ${distance.toFixed(1)} m from the reference source.`;
+      $('#delayResult').textContent = `Suggested delay: ${ms.toFixed(1)} ms (${seconds.toFixed(3)} s) for ${distance.toFixed(1)} ${unitText} (using standard ${speedText} at 20°C/68°F).`;
     }
 
     function renderMacro(note) {
@@ -1769,18 +1790,48 @@ Touch Panel, 7</textarea>
     }
 
     function drawSafeArea() {
-      activeCtx.strokeStyle = 'rgba(255,255,255,0.85)';
+      const w = activeCanvas.width;
+      const h = activeCanvas.height;
+      const actionX = w * 0.0625;
+      const actionY = h * 0.0625;
+      const titleX = w * 0.125;
+      const titleY = h * 0.125;
+
+      // 1. Outer safe rect (Action Safe)
+      activeCtx.strokeStyle = '#000000';
+      activeCtx.lineWidth = 4;
+      activeCtx.strokeRect(actionX, actionY, w - actionX * 2, h - actionY * 2);
+      
+      activeCtx.strokeStyle = 'rgba(255,255,255,0.9)';
       activeCtx.lineWidth = 2;
-      activeCtx.strokeRect(80, 45, activeCanvas.width - 160, activeCanvas.height - 90);
+      activeCtx.strokeRect(actionX, actionY, w - actionX * 2, h - actionY * 2);
 
-      activeCtx.strokeStyle = 'rgba(255,255,255,0.35)';
-      activeCtx.strokeRect(160, 90, activeCanvas.width - 320, activeCanvas.height - 180);
+      // 2. Inner safe rect (Title Safe)
+      activeCtx.strokeStyle = '#000000';
+      activeCtx.lineWidth = 3;
+      activeCtx.strokeRect(titleX, titleY, w - titleX * 2, h - titleY * 2);
 
+      activeCtx.strokeStyle = 'rgba(255,255,255,0.55)';
+      activeCtx.lineWidth = 1.5;
+      activeCtx.strokeRect(titleX, titleY, w - titleX * 2, h - titleY * 2);
+
+      // 3. Center crosshair
+      activeCtx.strokeStyle = '#000000';
+      activeCtx.lineWidth = 3;
       activeCtx.beginPath();
-      activeCtx.moveTo(activeCanvas.width / 2, 0);
-      activeCtx.lineTo(activeCanvas.width / 2, activeCanvas.height);
-      activeCtx.moveTo(0, activeCanvas.height / 2);
-      activeCtx.lineTo(activeCanvas.width, activeCanvas.height / 2);
+      activeCtx.moveTo(w / 2, 0);
+      activeCtx.lineTo(w / 2, h);
+      activeCtx.moveTo(0, h / 2);
+      activeCtx.lineTo(w, h / 2);
+      activeCtx.stroke();
+
+      activeCtx.strokeStyle = 'rgba(255,255,255,0.85)';
+      activeCtx.lineWidth = 1;
+      activeCtx.beginPath();
+      activeCtx.moveTo(w / 2, 0);
+      activeCtx.lineTo(w / 2, h);
+      activeCtx.moveTo(0, h / 2);
+      activeCtx.lineTo(w, h / 2);
       activeCtx.stroke();
     }
 
@@ -1906,8 +1957,14 @@ Touch Panel, 7</textarea>
       }
 
       // 2. Draw Client Logo or Placeholder
+      const logoMode = $('#slideLogoMode').value;
+      const showPlaceholder = logoMode === 'placeholder';
+      const showUploaded = logoMode === 'upload' && state.slideLogoImg;
+      const showLogo = showPlaceholder || showUploaded;
+      const textShift = showLogo ? 0 : h * 0.15;
+
       let logoY = h * 0.35;
-      if (state.slideLogoImg) {
+      if (showUploaded) {
         const img = state.slideLogoImg;
         const maxLogoH = h * 0.22;
         const scale = Math.min(w * 0.3 / img.width, maxLogoH / img.height);
@@ -1915,7 +1972,7 @@ Touch Panel, 7</textarea>
         const logoH = img.height * scale;
         const logoX = (w - logoW) / 2;
         ctx.drawImage(img, logoX, logoY - logoH / 2, logoW, logoH);
-      } else {
+      } else if (showPlaceholder) {
         // Placeholder logo: clean geometric emblem
         ctx.strokeStyle = accentColor;
         ctx.lineWidth = Math.max(4, w / 400);
@@ -1937,69 +1994,69 @@ Touch Panel, 7</textarea>
       if (template === 'logo') {
         ctx.fillStyle = textColor;
         ctx.font = `800 ${Math.max(28, w/32)}px 'Cabinet Grotesk', sans-serif`;
-        ctx.fillText(title, w/2, h * 0.65);
+        ctx.fillText(title, w/2, h * 0.65 - textShift);
         
         ctx.fillStyle = accentColor;
         ctx.font = `500 ${Math.max(16, w/64)}px Satoshi, sans-serif`;
-        ctx.fillText(subtitle, w/2, h * 0.73);
+        ctx.fillText(subtitle, w/2, h * 0.73 - textShift);
       } 
       else if (template === 'snafu') {
         ctx.fillStyle = accentColor;
         ctx.font = `700 ${Math.max(14, w/80)}px Satoshi, sans-serif`;
-        ctx.fillText("ATTENTION", w/2, h * 0.58);
+        ctx.fillText("ATTENTION", w/2, h * 0.58 - textShift);
         
         ctx.fillStyle = textColor;
         ctx.font = `800 ${Math.max(32, w/24)}px 'Cabinet Grotesk', sans-serif`;
-        ctx.fillText("TECHNICAL DIFFICULTIES", w/2, h * 0.66);
+        ctx.fillText("TECHNICAL DIFFICULTIES", w/2, h * 0.66 - textShift);
         
         ctx.fillStyle = textColor;
         ctx.globalAlpha = 0.7;
         ctx.font = `500 ${Math.max(16, w/50)}px Satoshi, sans-serif`;
-        ctx.fillText("PLEASE STAND BY. WE WILL RETURN MOMENTARILY.", w/2, h * 0.74);
+        ctx.fillText("PLEASE STAND BY. WE WILL RETURN MOMENTARILY.", w/2, h * 0.74 - textShift);
         ctx.globalAlpha = 1.0;
         
         ctx.fillStyle = accentColor;
         ctx.font = `600 ${Math.max(12, w/90)}px Satoshi, sans-serif`;
-        ctx.fillText(title, w/2, h * 0.85);
+        ctx.fillText(title, w/2, h * 0.85 - textShift);
       }
       else if (template === 'start') {
         ctx.fillStyle = accentColor;
         ctx.font = `700 ${Math.max(14, w/80)}px Satoshi, sans-serif`;
-        ctx.fillText("WELCOME TO", w/2, h * 0.58);
+        ctx.fillText("WELCOME TO", w/2, h * 0.58 - textShift);
         
         ctx.fillStyle = textColor;
         ctx.font = `800 ${Math.max(30, w/28)}px 'Cabinet Grotesk', sans-serif`;
-        ctx.fillText(title, w/2, h * 0.66);
+        ctx.fillText(title, w/2, h * 0.66 - textShift);
         
         ctx.fillStyle = textColor;
         ctx.font = `500 ${Math.max(18, w/48)}px Satoshi, sans-serif`;
-        ctx.fillText(subtitle || "THE SESSION WILL BEGIN SHORTLY", w/2, h * 0.75);
+        ctx.fillText(subtitle || "THE SESSION WILL BEGIN SHORTLY", w/2, h * 0.75 - textShift);
       }
       else if (template === 'intermission') {
         ctx.fillStyle = accentColor;
         ctx.font = `700 ${Math.max(14, w/80)}px Satoshi, sans-serif`;
-        ctx.fillText("INTERMISSION", w/2, h * 0.58);
+        ctx.fillText("INTERMISSION", w/2, h * 0.58 - textShift);
         
         ctx.fillStyle = textColor;
         ctx.font = `800 ${Math.max(32, w/26)}px 'Cabinet Grotesk', sans-serif`;
-        ctx.fillText("SESSION RESUMES SHORTLY", w/2, h * 0.67);
+        ctx.fillText("SESSION RESUMES SHORTLY", w/2, h * 0.67 - textShift);
         
         ctx.fillStyle = textColor;
         ctx.font = `500 ${Math.max(18, w/48)}px Satoshi, sans-serif`;
-        ctx.fillText(subtitle || "Thank you for your patience.", w/2, h * 0.75);
+        ctx.fillText(subtitle || "Thank you for your patience.", w/2, h * 0.75 - textShift);
       }
       else if (template === 'qa') {
         ctx.fillStyle = accentColor;
         ctx.font = `700 ${Math.max(14, w/80)}px Satoshi, sans-serif`;
-        ctx.fillText("LIVE Q&A", w/2, h * 0.58);
+        ctx.fillText("LIVE Q&A", w/2, h * 0.58 - textShift);
         
         ctx.fillStyle = textColor;
         ctx.font = `800 ${Math.max(32, w/26)}px 'Cabinet Grotesk', sans-serif`;
-        ctx.fillText("QUESTION & ANSWER SESSION", w/2, h * 0.67);
+        ctx.fillText("QUESTION & ANSWER SESSION", w/2, h * 0.67 - textShift);
         
         ctx.fillStyle = textColor;
         ctx.font = `500 ${Math.max(18, w/48)}px Satoshi, sans-serif`;
-        ctx.fillText(subtitle || "Please submit your questions to the moderator.", w/2, h * 0.75);
+        ctx.fillText(subtitle || "Please submit your questions to the moderator.", w/2, h * 0.75 - textShift);
       }
 
       // 4. Draw safety border
@@ -2483,6 +2540,16 @@ Touch Panel, 7</textarea>
 
     function attachEvents() {
       // Standby Slide Generator Listeners
+      const updateLogoUploadVisibility = () => {
+        const val = $('#slideLogoMode').value;
+        $('#slideLogoUploadField').style.display = val === 'upload' ? 'grid' : 'none';
+      };
+      updateLogoUploadVisibility();
+
+      $('#slideLogoMode').addEventListener('change', event => {
+        updateLogoUploadVisibility();
+      });
+
       $('#slideLogoInput').addEventListener('change', event => {
         const file = event.target.files[0];
         if (file) {
@@ -2515,7 +2582,7 @@ Touch Panel, 7</textarea>
       });
 
       const slideControls = [
-        '#slideTemplate', '#slideTitle', '#slideSubtitle', 
+        '#slideTemplate', '#slideLogoMode', '#slideTitle', '#slideSubtitle', 
         '#slideBgType', '#slidePrimaryColor', '#slideSecondaryColor', 
         '#slideTextColor', '#slideAccentColor'
       ];

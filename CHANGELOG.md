@@ -2,6 +2,26 @@
 
 All notable changes to the Corporate AV Toolkit project are documented in this file.
 
+## [2.1.2] - 2026-06-19
+
+### Added
+- **Standby & Still Slide Generator Logo Options**:
+  - Added a **Logo Option** selector with options for *Placeholder Logo*, *Upload Custom Logo...*, and *No Logo (Clean Slide)*.
+  - Hides the custom logo file input element when not in use.
+  - Added vertical text centering (offsetting position by `h * 0.15`) when no logo is displayed to produce clean, well-balanced slides.
+
+### Changed
+- **High-Visibility Safe Area Lines**:
+  - Upgraded safe area boundaries and crosshairs to draw dual-tone lines (a black outline under a white core) to ensure perfect contrast against the leftmost white color bar stripe and all other colors.
+  - Configured safe area coordinates to calculate dynamically based on canvas dimensions to scale correctly in inline, fullscreen, and downloaded modes.
+
+## [2.1.1] - 2026-06-19
+
+### Changed
+- **Speaker Delay Calculator Usability**:
+  - Simplified the speaker delay calculator by removing the manual speed of sound input.
+  - Added a unit selector to toggle between Meters (m) and Feet (ft), dynamically applying standard speed of sound constants (343 m/s for meters, 1125 ft/s for feet) tailored for climate-controlled indoor spaces.
+
 ## [2.1.0] - 2026-06-19
 
 ### Added

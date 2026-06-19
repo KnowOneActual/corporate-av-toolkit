@@ -57,4 +57,4 @@ Usage of the pre-packaged video footage is subject to the End User License Agree
 
 ## 🛠️ Code Tools
 
-These files are programmatically compiled using [generate_toolkit.py](file:///Users/userx/github_repo/01_ACTIVE/corporate-av-toolkit/05_Docs_&_Checklists/generate_toolkit.py) and optimized using [optimize_toolkit.py](file:///Users/userx/github_repo/01_ACTIVE/corporate-av-toolkit/05_Docs_&_Checklists/optimize_toolkit.py).
+These files are programmatically compiled using [generate_toolkit.py](05_Docs_&_Checklists/generate_toolkit.py) and optimized using [optimize_toolkit.py](/05_Docs_&_Checklists/optimize_toolkit.py).

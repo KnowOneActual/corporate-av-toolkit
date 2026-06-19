@@ -1033,6 +1033,7 @@
                   <option value="white">Solid White (brightness check)</option>
                   <option value="black">Solid Black (leak/contrast check)</option>
                   <option value="rgb">RGB Color Cycle (pixel audit)</option>
+                  <option value="slide">Standby / SNAFU Slide</option>
                 </select>
               </div>
               <div class="field" style="margin-top: var(--space-4);">
@@ -1050,6 +1051,87 @@
                 <button class="btn btn-primary" id="fullscreenPatternBtn"><i data-lucide="maximize"></i>Go Fullscreen</button>
               </div>
               <p class="result-box">Use the moving bar mode to spot stutter, frame conversion, and display processing lag.</p>
+            </div>
+          </div>
+
+          <div class="cards-2" style="margin-top: var(--space-6);">
+            <div class="subpanel">
+              <h4>Standby & Still Slide Generator (Logo/SNAFU)</h4>
+              <p style="margin-bottom: var(--space-4);">Create high-quality standby, walk-in, or technical difficulty slides with custom text and colors for switcher Still Stores.</p>
+              
+              <div class="field-grid" style="margin-bottom: var(--space-3);">
+                <div class="field">
+                  <label for="slideTemplate">Slide Template</label>
+                  <select id="slideTemplate">
+                    <option value="logo">Generic Logo Still (Walk-in)</option>
+                    <option value="snafu">Technical Difficulties (SNAFU)</option>
+                    <option value="start">Session Will Begin Shortly</option>
+                    <option value="intermission">Intermission (Resuming Shortly)</option>
+                    <option value="qa">Q&A Session</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="slideLogoInput">Upload Client Logo</label>
+                  <input type="file" id="slideLogoInput" accept="image/*" />
+                </div>
+              </div>
+              
+              <div class="field-grid" style="margin-bottom: var(--space-3);">
+                <div class="field">
+                  <label for="slideTitle">Client / Event Name</label>
+                  <input id="slideTitle" value="ACME CORP KEYNOTE" placeholder="e.g. Acme Corp Annual Keynote" />
+                </div>
+                <div class="field">
+                  <label for="slideSubtitle">Message / Subtitle</label>
+                  <input id="slideSubtitle" value="Please stand by..." placeholder="e.g. Session resumes in 10 minutes" />
+                </div>
+              </div>
+
+              <div class="field-grid-3" style="margin-bottom: var(--space-3);">
+                <div class="field">
+                  <label for="slideBgType">Bg Type</label>
+                  <select id="slideBgType">
+                    <option value="gradient-linear">Linear Gradient</option>
+                    <option value="gradient-radial">Radial Gradient</option>
+                    <option value="solid">Solid Color</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="slidePrimaryColor">Theme / Primary</label>
+                  <input type="color" id="slidePrimaryColor" value="#0f172a" style="padding: 0; height: 44px; cursor: pointer;" />
+                </div>
+                <div class="field">
+                  <label for="slideSecondaryColor">Secondary Color</label>
+                  <input type="color" id="slideSecondaryColor" value="#1e293b" style="padding: 0; height: 44px; cursor: pointer;" />
+                </div>
+              </div>
+
+              <div class="field-grid" style="margin-bottom: var(--space-4);">
+                <div class="field">
+                  <label for="slideTextColor">Text Color</label>
+                  <input type="color" id="slideTextColor" value="#f8fafc" style="padding: 0; height: 44px; cursor: pointer;" />
+                </div>
+                <div class="field">
+                  <label for="slideAccentColor">Accent Color</label>
+                  <input type="color" id="slideAccentColor" value="#38bdf8" style="padding: 0; height: 44px; cursor: pointer;" />
+                </div>
+              </div>
+
+              <div class="toolbar">
+                <button class="btn btn-primary" id="btnPreviewSlide"><i data-lucide="eye"></i>Preview Slide</button>
+                <button class="btn" id="btnDownload1080p"><i data-lucide="download"></i>Download 1080p</button>
+                <button class="btn" id="btnDownload4K"><i data-lucide="download"></i>Download 4K</button>
+              </div>
+            </div>
+            
+            <div class="subpanel">
+              <h4>Staging Best Practices</h4>
+              <ul style="margin: 0; padding-left: var(--space-4);">
+                <li style="margin-bottom: var(--space-2);"><strong>Still Store Upload</strong>: Always pre-load a static logo slide and a SNAFU slide into the main switcher STILL/LOGO store (e.g. Barco E2 or ATEM) on-site.</li>
+                <li style="margin-bottom: var(--space-2);"><strong>Destination Mappings</strong>: Map a dedicated physical button on the control surface (Stream Deck, Event Master tool) to transition the program screen to the logo/still store instantly.</li>
+                <li style="margin-bottom: var(--space-2);"><strong>Logo Formats</strong>: For transparent logo overlays, upload PNG files with transparent backgrounds. For full frame background stills, use 1080p or 4K high-quality PNGs or 100% quality JPGs.</li>
+                <li style="margin-bottom: var(--space-2);"><strong>Text Contrast</strong>: Ensure text uses a high contrast color (like white or bright yellow) over the dark brand background to remain clearly legible under bright venue wash lighting.</li>
+              </ul>
             </div>
           </div>
         </section>
@@ -1305,7 +1387,8 @@ Touch Panel, 7</textarea>
       activePanner: null,
       sweepInterval: null,
       activeSoundId: null,
-      volume: 0.5
+      volume: 0.5,
+      slideLogoImg: null
     };
 
     state.activeProfileId = state.profiles[0].id;
@@ -1784,7 +1867,162 @@ Touch Panel, 7</textarea>
             drawPattern('rgb');
           }
         }, 2000);
+      } else if (pattern === 'slide') {
+        drawStillSlide(activeCanvas, activeCtx);
       }
+    }
+
+    function drawStillSlide(canvas, ctx) {
+      const w = canvas.width;
+      const h = canvas.height;
+      
+      const bgType = $('#slideBgType').value;
+      const primary = $('#slidePrimaryColor').value;
+      const secondary = $('#slideSecondaryColor').value;
+      const textColor = $('#slideTextColor').value;
+      const accentColor = $('#slideAccentColor').value;
+      
+      const template = $('#slideTemplate').value;
+      const title = $('#slideTitle').value.toUpperCase();
+      const subtitle = $('#slideSubtitle').value;
+
+      // 1. Draw Background
+      ctx.clearRect(0, 0, w, h);
+      if (bgType === 'solid') {
+        ctx.fillStyle = primary;
+        ctx.fillRect(0, 0, w, h);
+      } else if (bgType === 'gradient-linear') {
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, primary);
+        grad.addColorStop(1, secondary);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+      } else if (bgType === 'gradient-radial') {
+        const grad = ctx.createRadialGradient(w/2, h/2, h/6, w/2, h/2, w/1.2);
+        grad.addColorStop(0, primary);
+        grad.addColorStop(1, secondary);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      // 2. Draw Client Logo or Placeholder
+      let logoY = h * 0.35;
+      if (state.slideLogoImg) {
+        const img = state.slideLogoImg;
+        const maxLogoH = h * 0.22;
+        const scale = Math.min(w * 0.3 / img.width, maxLogoH / img.height);
+        const logoW = img.width * scale;
+        const logoH = img.height * scale;
+        const logoX = (w - logoW) / 2;
+        ctx.drawImage(img, logoX, logoY - logoH / 2, logoW, logoH);
+      } else {
+        // Placeholder logo: clean geometric emblem
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = Math.max(4, w / 400);
+        ctx.beginPath();
+        ctx.arc(w/2, logoY, Math.min(w/24, h/14), 0, Math.PI * 2);
+        ctx.stroke();
+        
+        ctx.fillStyle = textColor;
+        ctx.font = `800 ${Math.max(14, w/80)}px 'Cabinet Grotesk', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('LOGO', w/2, logoY);
+      }
+
+      // 3. Draw Template Text
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      
+      if (template === 'logo') {
+        ctx.fillStyle = textColor;
+        ctx.font = `800 ${Math.max(28, w/32)}px 'Cabinet Grotesk', sans-serif`;
+        ctx.fillText(title, w/2, h * 0.65);
+        
+        ctx.fillStyle = accentColor;
+        ctx.font = `500 ${Math.max(16, w/64)}px Satoshi, sans-serif`;
+        ctx.fillText(subtitle, w/2, h * 0.73);
+      } 
+      else if (template === 'snafu') {
+        ctx.fillStyle = accentColor;
+        ctx.font = `700 ${Math.max(14, w/80)}px Satoshi, sans-serif`;
+        ctx.fillText("ATTENTION", w/2, h * 0.58);
+        
+        ctx.fillStyle = textColor;
+        ctx.font = `800 ${Math.max(32, w/24)}px 'Cabinet Grotesk', sans-serif`;
+        ctx.fillText("TECHNICAL DIFFICULTIES", w/2, h * 0.66);
+        
+        ctx.fillStyle = textColor;
+        ctx.globalAlpha = 0.7;
+        ctx.font = `500 ${Math.max(16, w/50)}px Satoshi, sans-serif`;
+        ctx.fillText("PLEASE STAND BY. WE WILL RETURN MOMENTARILY.", w/2, h * 0.74);
+        ctx.globalAlpha = 1.0;
+        
+        ctx.fillStyle = accentColor;
+        ctx.font = `600 ${Math.max(12, w/90)}px Satoshi, sans-serif`;
+        ctx.fillText(title, w/2, h * 0.85);
+      }
+      else if (template === 'start') {
+        ctx.fillStyle = accentColor;
+        ctx.font = `700 ${Math.max(14, w/80)}px Satoshi, sans-serif`;
+        ctx.fillText("WELCOME TO", w/2, h * 0.58);
+        
+        ctx.fillStyle = textColor;
+        ctx.font = `800 ${Math.max(30, w/28)}px 'Cabinet Grotesk', sans-serif`;
+        ctx.fillText(title, w/2, h * 0.66);
+        
+        ctx.fillStyle = textColor;
+        ctx.font = `500 ${Math.max(18, w/48)}px Satoshi, sans-serif`;
+        ctx.fillText(subtitle || "THE SESSION WILL BEGIN SHORTLY", w/2, h * 0.75);
+      }
+      else if (template === 'intermission') {
+        ctx.fillStyle = accentColor;
+        ctx.font = `700 ${Math.max(14, w/80)}px Satoshi, sans-serif`;
+        ctx.fillText("INTERMISSION", w/2, h * 0.58);
+        
+        ctx.fillStyle = textColor;
+        ctx.font = `800 ${Math.max(32, w/26)}px 'Cabinet Grotesk', sans-serif`;
+        ctx.fillText("SESSION RESUMES SHORTLY", w/2, h * 0.67);
+        
+        ctx.fillStyle = textColor;
+        ctx.font = `500 ${Math.max(18, w/48)}px Satoshi, sans-serif`;
+        ctx.fillText(subtitle || "Thank you for your patience.", w/2, h * 0.75);
+      }
+      else if (template === 'qa') {
+        ctx.fillStyle = accentColor;
+        ctx.font = `700 ${Math.max(14, w/80)}px Satoshi, sans-serif`;
+        ctx.fillText("LIVE Q&A", w/2, h * 0.58);
+        
+        ctx.fillStyle = textColor;
+        ctx.font = `800 ${Math.max(32, w/26)}px 'Cabinet Grotesk', sans-serif`;
+        ctx.fillText("QUESTION & ANSWER SESSION", w/2, h * 0.67);
+        
+        ctx.fillStyle = textColor;
+        ctx.font = `500 ${Math.max(18, w/48)}px Satoshi, sans-serif`;
+        ctx.fillText(subtitle || "Please submit your questions to the moderator.", w/2, h * 0.75);
+      }
+
+      // 4. Draw safety border
+      ctx.strokeStyle = accentColor;
+      ctx.lineWidth = Math.max(1, w / 400);
+      ctx.globalAlpha = 0.3;
+      ctx.strokeRect(w * 0.05, h * 0.05, w * 0.9, h * 0.9);
+      ctx.globalAlpha = 1.0;
+    }
+
+    function downloadSlide(resolutionWidth, resolutionHeight) {
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = resolutionWidth;
+      offCanvas.height = resolutionHeight;
+      const offCtx = offCanvas.getContext('2d');
+      
+      drawStillSlide(offCanvas, offCtx);
+      
+      const filename = `still_${$('#slideTemplate').value}_${resolutionWidth}x${resolutionHeight}.png`;
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = offCanvas.toDataURL('image/png');
+      link.click();
     }
 
     function animateMotion() {
@@ -2244,6 +2482,56 @@ Touch Panel, 7</textarea>
     }
 
     function attachEvents() {
+      // Standby Slide Generator Listeners
+      $('#slideLogoInput').addEventListener('change', event => {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              state.slideLogoImg = img;
+              if ($('#patternSelect').value === 'slide') {
+                drawPattern('slide');
+              }
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      $('#btnPreviewSlide').addEventListener('click', () => {
+        $('#patternSelect').value = 'slide';
+        drawPattern('slide');
+      });
+
+      $('#btnDownload1080p').addEventListener('click', () => {
+        downloadSlide(1920, 1080);
+      });
+
+      $('#btnDownload4K').addEventListener('click', () => {
+        downloadSlide(3840, 2160);
+      });
+
+      const slideControls = [
+        '#slideTemplate', '#slideTitle', '#slideSubtitle', 
+        '#slideBgType', '#slidePrimaryColor', '#slideSecondaryColor', 
+        '#slideTextColor', '#slideAccentColor'
+      ];
+      slideControls.forEach(selector => {
+        $(selector).addEventListener('input', () => {
+          if ($('#patternSelect').value === 'slide') {
+            drawPattern('slide');
+          }
+        });
+        $(selector).addEventListener('change', () => {
+          if ($('#patternSelect').value === 'slide') {
+            drawPattern('slide');
+          }
+        });
+      });
+
       $('#themeToggle').addEventListener('click', toggleTheme);
       $('#calcDelayBtn').addEventListener('click', calculateDelay);
       $('#dmxCalcBtn').addEventListener('click', renderDMX);

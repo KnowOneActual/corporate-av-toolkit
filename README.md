@@ -45,6 +45,7 @@ Video assets for digital signage and virtual backgrounds.
 * 🎥 **`abstract_light_waves.mp4` / `blue_shining_stream_beam.mp4` / `golden_center_light_rays.mp4` / `lines_of_green_lights_move_in_waves.mp4` / `blue_black_vertical_shining_beam.mp4`**: H.264 video loops for screen calibration and signage testing.
 * 🎥 **`video_02_judder_refresh_rate_test.mp4`**: A 60 FPS judder test loop with a moving bar and calibration lines to test refresh rate smoothness and V-Sync.
 * 🎥 **`video_03_smpte_color_bars_moving.mp4`**: 30 FPS color bars with a moving reference block and a 1 kHz tone at -20 dBFS to verify color mapping, display brightness, and signal freeze.
+* 🖼️ **`still_01_logo_placeholder.png` to `still_05_qa_session.png`**: Standard 1080p PNG backup still frames for switcher Still Stores (Logo Placeholder, Technical Difficulties, Session Starting, Intermission, and Q&A).
 
 ### 📁 `04_Presentations_&_Scripts/`
 Slide decks, presenter notes, and scripts.

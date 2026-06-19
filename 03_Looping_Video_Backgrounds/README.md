@@ -20,6 +20,13 @@ This directory contains video assets for live events, digital signage, and virtu
 * 🎥 **`video_02_judder_refresh_rate_test.mp4`**: 60 FPS vertical movement test to analyze panel judder, refresh rates, and screen tearing.
 * 🎥 **`video_03_smpte_color_bars_moving.mp4`**: 30 FPS color bar pattern with a moving reference block and a synchronized 1 kHz tone at -20 dBFS.
 
+### 🖼️ Event Still / Standby Slides (1080p PNGs)
+* 🖼️ **`still_01_logo_placeholder.png`**: Neutral client logo still slide for walk-in / walk-out.
+* 🖼️ **`still_02_technical_difficulties.png`**: The classic SNAFU / "Technical Difficulties - Please Stand By" slide.
+* 🖼️ **`still_03_session_starting.png`**: "Welcome - The Session Will Begin Shortly" slide.
+* 🖼️ **`still_04_intermission.png`**: Intermission still slide to indicate ongoing breaks.
+* 🖼️ **`still_05_qa_session.png`**: Q&A session slide to overlay or display during question periods.
+
 ---
 
 ## 📖 Staging & Calibration Instructions
